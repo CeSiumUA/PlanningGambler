@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PlanningGambler.Dtos.Requests;
-using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Services.Abstract;
 
@@ -15,7 +14,7 @@ public class RoomsController : ControllerBase
     {
         this._roomsService = roomsService;
     }
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody]BaseRoomRequest request)
     {
         try
@@ -30,16 +29,24 @@ public class RoomsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Join([FromBody]BaseRoomRequest request)
+    public async Task<IActionResult> Join([FromBody]JoinRoomRequest request)
     {
         try
         {
-            var tokenResult = await _roomsService.JoinRoom(request.DisplayName, request.RoomPassword);
+            var tokenResult = await _roomsService.JoinRoom(request.DisplayName, request.RoomPassword, request.RoomId);
             return new JsonResult(tokenResult);
         }
         catch (IncorrectPasswordException)
         {
             return Unauthorized();
+        }
+        catch (RoomNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (NameAlreadyTakenException)
+        {
+            return Conflict();
         }
         catch
         {

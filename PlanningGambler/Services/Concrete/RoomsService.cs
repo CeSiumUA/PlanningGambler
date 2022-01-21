@@ -1,7 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using PlanningGambler.Dtos.Results;
+using PlanningGambler.Dtos;
 using PlanningGambler.Models;
+using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Models.Rooms;
 using PlanningGambler.Services.Abstract;
 
@@ -16,7 +17,7 @@ public class RoomsService : IRoomsService
         _roomStorage = roomStorage;
         _tokenService = tokenService;
     }
-    public async Task<TokenResultDto> CreateRoom(string displayName, string? roomPassword)
+    public async Task<RoomToken> CreateRoom(string displayName, string? roomPassword)
     {
         var room = new Room();
         if (roomPassword != null)
@@ -30,21 +31,42 @@ public class RoomsService : IRoomsService
 
         _roomStorage.AddRoom(room);
 
-        var participantToken = await _tokenService.CreateTokenAsync(planningParticipant);
+        var participantToken = _tokenService.CreateToken(planningParticipant);
 
-        return new TokenResultDto(
-            participantToken.Token,
-            participantToken.DisplayName,
-            participantToken.ExpireAt,
-            participantToken.MemberType,
-            participantToken.RoomId,
-            participantToken.UserId,
-            null);
+        return participantToken;
     }
 
-    public async Task<TokenResultDto> JoinRoom(string displayName, string? roomPassword)
+    public async Task<RoomToken> JoinRoom(string displayName, string? roomPassword, Guid roomId)
     {
-        throw new NotImplementedException();
+        var room = _roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+        if (room.UsePassword)
+        {
+            if (roomPassword == null)
+            {
+                throw new IncorrectPasswordException();
+            }
+            var passwordHash = await CreateHash(roomPassword);
+            var isPasswordCorrect = Enumerable.SequenceEqual(passwordHash, room.PasswordHash);
+            if (!isPasswordCorrect)
+            {
+                throw new IncorrectPasswordException();
+            }
+        }
+
+        if (room.Participants.Any(x => x.DisplayName == displayName))
+        {
+            throw new NameAlreadyTakenException(displayName);
+        }
+        
+        var planningParticipant = new PlanningParticipant(Guid.NewGuid(), displayName, MemberType.Participant, room.Id);
+
+        var token = _tokenService.CreateToken(planningParticipant);
+
+        return token;
     }
 
     private async Task<byte[]> CreateHash(string password)

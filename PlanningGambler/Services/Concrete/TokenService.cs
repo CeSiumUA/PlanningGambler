@@ -2,14 +2,13 @@
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using PlanningGambler.Dtos;
-using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 
 namespace PlanningGambler.Services.Concrete;
 
 public class TokenService
 {
-    public async Task<RoomToken> CreateTokenAsync(PlanningParticipant planningParticipant)
+    public RoomToken CreateToken(PlanningParticipant planningParticipant)
     {
         var claims = new[]
         {
