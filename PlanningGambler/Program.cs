@@ -7,15 +7,20 @@ using PlanningGambler.Services.Concrete;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(auth =>
+    {
+        auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = true;
         options.Events = new JwtBearerEvents()
         {
             OnMessageReceived = context =>
             {
                 var accessToken = context.Request.Query["access_token"];
-
                 var path = context.HttpContext.Request.Path;
                 if (!string.IsNullOrEmpty(accessToken) &&
                     path.StartsWithSegments("/planninghub"))
@@ -31,6 +36,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ValidateAudience = false,
             IssuerSigningKey = new SymmetricSecurityKey(TokenOptions.SigningKey)
         };
     });
@@ -63,9 +69,10 @@ app.UseCors(policyBuilder =>
         .AllowCredentials();
 });
 
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapHub<PlanningHub>("/planninghub");
 
