@@ -28,7 +28,7 @@ public class RoomsController : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpPost("join")]
     public async Task<IActionResult> Join([FromBody]JoinRoomRequest request)
     {
         try

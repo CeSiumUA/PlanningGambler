@@ -8,7 +8,7 @@ using PlanningGambler.Services.Abstract;
 
 namespace PlanningGambler.Services.Concrete;
 
-public class RoomsService : IRoomsService
+public class RoomsService : IRoomsService, IRoomManagerService
 {
     private readonly IRoomStorage _roomStorage;
     private readonly TokenService _tokenService;
@@ -27,7 +27,6 @@ public class RoomsService : IRoomsService
         }
 
         var planningParticipant = new PlanningParticipant(Guid.NewGuid(), displayName, MemberType.Administrator, room.Id);
-        room.Participants.Add(planningParticipant);
 
         _roomStorage.AddRoom(room);
 

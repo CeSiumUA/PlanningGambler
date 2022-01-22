@@ -10,6 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.Events = new JwtBearerEvents()
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/planninghub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
         options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidIssuer = TokenOptions.ValidIssuer,
@@ -23,11 +38,30 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policyBuilder =>
+    {
+        policyBuilder.AllowAnyHeader();
+        policyBuilder.AllowAnyOrigin();
+        policyBuilder.AllowAnyMethod();
+    });
+});
+
 builder.Services.AddScoped<IRoomsService, RoomsService>();
+builder.Services.AddScoped<IRoomManagerService, RoomsService>();
 builder.Services.AddSingleton<IRoomStorage, RoomStorageService>();
 builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
+
+app.UseCors(policyBuilder =>
+{
+    policyBuilder.AllowAnyHeader()
+        .AllowAnyMethod()
+        .SetIsOriginAllowed((host) => true)
+        .AllowCredentials();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

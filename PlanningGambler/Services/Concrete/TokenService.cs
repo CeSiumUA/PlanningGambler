@@ -14,7 +14,8 @@ public class TokenService
         {
             new Claim(ClaimTypes.Name, planningParticipant.DisplayName),
             new Claim(ClaimTypes.Role, planningParticipant.MemberType.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, planningParticipant.Id.ToString())
+            new Claim(ClaimTypes.NameIdentifier, planningParticipant.Id.ToString()),
+            new Claim(ClaimTypes.GroupSid, planningParticipant.RoomId.ToString())
         };
         var securityKey = new SymmetricSecurityKey(TokenOptions.SigningKey);
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
