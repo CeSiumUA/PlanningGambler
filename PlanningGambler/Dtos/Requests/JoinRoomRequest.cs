@@ -1,6 +1,14 @@
-﻿namespace PlanningGambler.Dtos.Requests;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record JoinRoomRequest(
-    string DisplayName,
-    string? RoomPassword,
-    Guid RoomId) : BaseRoomRequest(DisplayName, RoomPassword);
+namespace PlanningGambler.Dtos.Requests;
+
+public record JoinRoomRequest : BaseRoomRequest
+{
+    [Required]
+    public Guid RoomId { get; init; }
+
+    public JoinRoomRequest(string displayName, string? roomPassword, Guid roomId) : base(displayName, roomPassword)
+    {
+        this.RoomId = roomId;
+    }
+}
