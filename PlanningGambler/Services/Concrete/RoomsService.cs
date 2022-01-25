@@ -68,6 +68,26 @@ public class RoomsService : IRoomsService, IRoomManagerService
         return token;
     }
 
+    public async Task AddParticipantToRoom(PlanningParticipant planningParticipant)
+    {
+        var room = _roomStorage.GetRoom(planningParticipant.RoomId);
+        if (room != null)
+        {
+            room.Participants.Add(planningParticipant);
+        }
+
+        throw new RoomNotFoundException(planningParticipant.RoomId);
+    }
+
+    public async Task RemoveParticipantFromRoom(Guid roomId, Guid planningParticipantId)
+    {
+        var room = _roomStorage.GetRoom(roomId);
+        if (room != null)
+        {
+            room.Participants.RemoveAll(x => x.Id == planningParticipantId);
+        }
+    }
+
     private async Task<byte[]> CreateHash(string password)
     {
         using (var sha = SHA256.Create())

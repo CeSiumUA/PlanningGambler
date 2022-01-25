@@ -5,7 +5,7 @@ public class Room
     public Guid Id { get; } = Guid.NewGuid();
     public bool UsePassword { get; set; } = false;
     public byte[] PasswordHash { get; set; } = new byte[]{};
-    public List<PlanningParticipantConnection> Participants { get; } = new();
+    public List<PlanningParticipant> Participants { get; } = new();
     public PlanningStage? CurrentStage { get; set; }
 
     public int? CurrentStageNumber

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using PlanningGambler.Dtos;
+using PlanningGambler.Dtos.Requests;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
 
@@ -16,17 +17,25 @@ public class PlanningHub : Hub
         this._roomManagerService = roomManagerService;
     }
 
+    public async Task CreateStage(CreateStageRequest createStageRequest)
+    {
+        
+    }
+
     public override async Task OnConnectedAsync()
     {
         if (Context.User != null)
         {
-            var roomId = RetreiveRoomId().ToString();
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+            var roomId = RetrieveRoomId();
+            var roomIdString = roomId.ToString();
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomIdString);
             var memberType = RetreiveMemberType();
             var id = RetreiveId();
             var displayName = RetreiveDisplayName();
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
-            await Clients.Group(roomId).SendAsync("ParticipantConnected", participantDto);
+            await Clients.Group(roomIdString).SendAsync("ParticipantConnected", participantDto);
+            var participant = new PlanningParticipant(id, displayName ?? string.Empty, memberType, roomId);
+            await _roomManagerService.AddParticipantToRoom(participant);
         }
 
         await base.OnConnectedAsync();
@@ -36,19 +45,21 @@ public class PlanningHub : Hub
     {
         if (Context.User != null)
         {
-            var roomId = RetreiveRoomId().ToString();
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+            var roomId = RetrieveRoomId();
+            var roomIdString = roomId.ToString();
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomIdString);
             var memberType = RetreiveMemberType();
             var id = RetreiveId();
             var displayName = RetreiveDisplayName();
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
-            await Clients.Group(roomId).SendAsync("ParticipantDisconnected", participantDto);
+            await Clients.Group(roomIdString).SendAsync("ParticipantDisconnected", participantDto);
+            await _roomManagerService.RemoveParticipantFromRoom(roomId, id);
         }
         
         await base.OnDisconnectedAsync(exception);
     }
 
-    private Guid RetreiveRoomId()
+    private Guid RetrieveRoomId()
     {
         var roomId = Context.User?.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value;
         if (string.IsNullOrEmpty(roomId))
