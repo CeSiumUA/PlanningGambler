@@ -21,4 +21,20 @@ public class Room
         }
     }
     public List<PlanningStage> Stages { get; } = new();
+
+    public void NextStage()
+    {
+        if (this.Stages.Count == 0)
+        {
+            return;
+        }
+
+        int nextIndex = (this.CurrentStageNumber ?? 0) + 1;
+        if (nextIndex >= this.Stages.Count)
+        {
+            return;
+        }
+
+        this.CurrentStage = this.Stages[nextIndex];
+    }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using PlanningGambler.Dtos;
 using PlanningGambler.Dtos.Requests;
+using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
 
@@ -16,12 +17,27 @@ public class PlanningHub : Hub
     {
         this._roomManagerService = roomManagerService;
     }
-
+    [Authorize(Roles = "Administrator")]
     public async Task CreateStage(CreateStageRequest createStageRequest)
     {
-        
+        if(Context.User == null) return;
+        var roomId = RetrieveRoomId();
+        var createStageResult = _roomManagerService.CreateVotingStage(roomId, createStageRequest.Title, createStageRequest.Deadline);
+        if(createStageResult == null) return;
+        await Clients.Group(roomId.ToString()).SendAsync("StageCreated", createStageResult);
     }
 
+    [Authorize(Roles = "Administrator")]
+    public async Task SelectStage(Guid stageId)
+    {
+        if(Context.User == null) return;
+        var roomId = RetrieveRoomId();
+        if (_roomManagerService.CheckStageExists(roomId, stageId))
+        {
+            await Clients.Group(roomId.ToString()).SendAsync("StageSelected", stageId);
+        }
+    }
+    
     public override async Task OnConnectedAsync()
     {
         if (Context.User != null)

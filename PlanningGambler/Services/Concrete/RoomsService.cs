@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using PlanningGambler.Dtos;
+using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Models.Rooms;
@@ -86,6 +87,30 @@ public class RoomsService : IRoomsService, IRoomManagerService
         {
             room.Participants.RemoveAll(x => x.Id == planningParticipantId);
         }
+    }
+
+    public NewStageResult? CreateVotingStage(Guid roomId, string title, DateTimeOffset? deadline = null)
+    {
+        var room = _roomStorage.GetRoom(roomId);
+        if(room == null) return null;
+        var stage = new PlanningStage(Guid.NewGuid(), title, new List<Voting>(), deadline);
+        room.Stages.Add(stage);
+        return new NewStageResult(
+            stage.Id,
+            stage.Title,
+            stage.Deadline
+            );
+    }
+
+    public bool CheckStageExists(Guid roomId, Guid stageId)
+    {
+        var room = _roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+
+        return room.Stages.Any(x => x.Id == stageId);
     }
 
     private async Task<byte[]> CreateHash(string password)
