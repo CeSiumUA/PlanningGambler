@@ -17,6 +17,7 @@ public class PlanningHub : Hub
     {
         this._roomManagerService = roomManagerService;
     }
+    #region Administrator Methods
     [Authorize(Roles = "Administrator")]
     public async Task CreateStage(CreateStageRequest createStageRequest)
     {
@@ -32,10 +33,33 @@ public class PlanningHub : Hub
     {
         if(Context.User == null) return;
         var roomId = RetrieveRoomId();
-        if (_roomManagerService.CheckStageExists(roomId, stageId))
+        _roomManagerService.SelectActiveStage(roomId, stageId);
+        await Clients.Group(roomId.ToString()).SendAsync("StageSelected", stageId);
+    }
+
+    [Authorize(Roles = "Administrator")]
+    public async Task StartCountDown()
+    {
+        if(Context.User == null) return;
+        var roomId = RetrieveRoomId();
+        for(int i = 5; i > 0; i--)
         {
-            await Clients.Group(roomId.ToString()).SendAsync("StageSelected", stageId);
+            await Clients.Group(roomId.ToString()).SendAsync("CountDown", i);
+            await Task.Delay(1000);
         }
+
+        var votes = _roomManagerService.GetStageVotes(roomId).ToArray();
+        await Clients.Group(roomId.ToString()).SendAsync("StageVotingResult", votes);
+    }
+    #endregion
+
+    public async Task Vote(int vote)
+    {
+        if(Context.User == null) return;
+        var roomId = RetrieveRoomId();
+        var userId = RetrieveId();
+        var votingResult = _roomManagerService.Vote(roomId, userId, vote);
+        await Clients.Group(roomId.ToString()).SendAsync("ParticipantVoted", votingResult);
     }
     
     public override async Task OnConnectedAsync()
@@ -45,9 +69,9 @@ public class PlanningHub : Hub
             var roomId = RetrieveRoomId();
             var roomIdString = roomId.ToString();
             await Groups.AddToGroupAsync(Context.ConnectionId, roomIdString);
-            var memberType = RetreiveMemberType();
-            var id = RetreiveId();
-            var displayName = RetreiveDisplayName();
+            var memberType = RetrieveMemberType();
+            var id = RetrieveId();
+            var displayName = RetrieveDisplayName();
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
             await Clients.Group(roomIdString).SendAsync("ParticipantConnected", participantDto);
             var participant = new PlanningParticipant(id, displayName ?? string.Empty, memberType, roomId);
@@ -64,9 +88,9 @@ public class PlanningHub : Hub
             var roomId = RetrieveRoomId();
             var roomIdString = roomId.ToString();
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomIdString);
-            var memberType = RetreiveMemberType();
-            var id = RetreiveId();
-            var displayName = RetreiveDisplayName();
+            var memberType = RetrieveMemberType();
+            var id = RetrieveId();
+            var displayName = RetrieveDisplayName();
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
             await Clients.Group(roomIdString).SendAsync("ParticipantDisconnected", participantDto);
             await _roomManagerService.RemoveParticipantFromRoom(roomId, id);
@@ -84,11 +108,11 @@ public class PlanningHub : Hub
         }
         return Guid.Parse(roomId);
     }
-    private string? RetreiveDisplayName()
+    private string? RetrieveDisplayName()
     {
         return Context.User?.Claims.First(x => x.Type == ClaimTypes.Name).Value;
     }
-    private Guid RetreiveId()
+    private Guid RetrieveId()
     {
         var id = Context.User?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         if (string.IsNullOrEmpty(id))
@@ -98,7 +122,7 @@ public class PlanningHub : Hub
 
         return Guid.Parse(id);
     }
-    private MemberType RetreiveMemberType()
+    private MemberType RetrieveMemberType()
     {
         var memberString = Context.User?.Claims.First(x => x.Type == ClaimTypes.Role).Value;
         if (string.IsNullOrEmpty(memberString))

@@ -102,7 +102,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
             );
     }
 
-    public bool CheckStageExists(Guid roomId, Guid stageId)
+    public void SelectActiveStage(Guid roomId, Guid stageId)
     {
         var room = _roomStorage.GetRoom(roomId);
         if (room == null)
@@ -110,7 +110,54 @@ public class RoomsService : IRoomsService, IRoomManagerService
             throw new RoomNotFoundException(roomId);
         }
 
-        return room.Stages.Any(x => x.Id == stageId);
+        var stage = room.Stages.FirstOrDefault(x => x.Id == stageId);
+        if (stage == null)
+        {
+            throw new StageNotFoundException(stageId);
+        }
+
+        room.CurrentStage = stage;
+    }
+
+    public HiddenVotingResult Vote(Guid roomId, Guid userId, int vote)
+    {
+        if (VoteOption.VoteOptions.Any(x => x == vote))
+        {
+            throw new ArgumentException();
+        }
+        var room = _roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+
+        if (room.CurrentStage == null) throw new StageNotFoundException(Guid.Empty);
+
+        var participant = room.Participants.FirstOrDefault(x => x.Id == userId);
+        if (participant == null) throw new ParticipantNotFoundException(userId);
+        var existingVote = room.CurrentStage.Votes.FirstOrDefault(x => x.Voter.Id == participant.Id);
+        if (existingVote != null)
+        {
+            existingVote.Vote = vote;
+        }
+        else
+        {
+            var voting = new Voting(participant, vote);
+            room.CurrentStage.Votes.Add(voting);
+        }
+
+        return new HiddenVotingResult(room.CurrentStage.Id, userId);
+    }
+
+    public IEnumerable<VotingResult> GetStageVotes(Guid roomId)
+    {
+        var room = _roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+        if (room.CurrentStage == null) throw new StageNotFoundException(Guid.Empty);
+        return room.CurrentStage.Votes.Select(x => new VotingResult(x.Voter.Id, room.CurrentStage.Id, x.Vote));
     }
 
     private async Task<byte[]> CreateHash(string password)
