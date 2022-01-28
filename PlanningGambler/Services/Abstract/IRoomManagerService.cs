@@ -12,4 +12,5 @@ public interface IRoomManagerService
     public void SelectActiveStage(Guid roomId, Guid stageId);
     public HiddenVotingResult Vote(Guid roomId, Guid userId, int vote);
     public IEnumerable<VotingResult> GetStageVotes(Guid roomId);
+    public RoomInfo GetRoom(Guid roomId);
 }

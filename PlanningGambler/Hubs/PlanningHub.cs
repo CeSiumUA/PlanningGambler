@@ -53,6 +53,12 @@ public class PlanningHub : Hub
     }
     #endregion
 
+    public async Task FetchRoom()
+    {
+        if(Context.User == null) return;
+        var roomId = RetrieveRoomId();
+    }
+    
     public async Task Vote(int vote)
     {
         if(Context.User == null) return;

@@ -160,6 +160,17 @@ public class RoomsService : IRoomsService, IRoomManagerService
         return room.CurrentStage.Votes.Select(x => new VotingResult(x.Voter.Id, room.CurrentStage.Id, x.Vote));
     }
 
+    public RoomInfo GetRoom(Guid roomId)
+    {
+        var room = _roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+
+        return new RoomInfo(room.Id, room.Participants.ToArray(), room.CurrentStage);
+    }
+
     private async Task<byte[]> CreateHash(string password)
     {
         using (var sha = SHA256.Create())
