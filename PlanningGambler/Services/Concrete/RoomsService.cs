@@ -72,12 +72,11 @@ public class RoomsService : IRoomsService, IRoomManagerService
     public async Task AddParticipantToRoom(PlanningParticipant planningParticipant)
     {
         var room = _roomStorage.GetRoom(planningParticipant.RoomId);
-        if (room != null)
+        if (room == null)
         {
-            room.Participants.Add(planningParticipant);
+            throw new RoomNotFoundException(planningParticipant.RoomId);
         }
-
-        throw new RoomNotFoundException(planningParticipant.RoomId);
+        room.Participants.Add(planningParticipant);
     }
 
     public async Task RemoveParticipantFromRoom(Guid roomId, Guid planningParticipantId)
