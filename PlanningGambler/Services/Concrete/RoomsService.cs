@@ -167,7 +167,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
             throw new RoomNotFoundException(roomId);
         }
 
-        return new RoomInfo(room.Id, room.Participants.ToArray(), room.CurrentStage);
+        return new RoomInfo(room.Id, room.Participants.ToArray(), room.CurrentStage, room.Stages.ToArray());
     }
 
     private async Task<byte[]> CreateHash(string password)
