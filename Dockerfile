@@ -17,4 +17,4 @@ RUN dotnet publish "PlanningGambler.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "PlanningGambler.dll"]
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet PlanningGambler.dll
