@@ -59,7 +59,7 @@ public class RoomsController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("verify")]
+    [HttpGet("verify")]
     public async Task<IActionResult> Verify()
     {
         var roomId = Guid.Parse(this.HttpContext.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
