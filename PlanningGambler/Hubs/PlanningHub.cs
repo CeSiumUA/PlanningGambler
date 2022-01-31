@@ -80,9 +80,12 @@ public class PlanningHub : Hub
             var id = RetrieveId();
             var displayName = RetrieveDisplayName();
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
-            await Clients.Group(roomIdString).SendAsync("ParticipantConnected", participantDto);
             var participant = new PlanningParticipant(id, displayName ?? string.Empty, memberType, roomId);
             await _roomManagerService.AddParticipantToRoom(participant);
+            var newParticipantsList = _roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
+            var participantsChanged =
+                new ParticipantsChangedDto(participantDto, newParticipantsList);
+            await Clients.GroupExcept(roomIdString, new []{this.Context.ConnectionId}).SendAsync("ParticipantConnected", participantsChanged);
         }
 
         await base.OnConnectedAsync();
@@ -98,9 +101,12 @@ public class PlanningHub : Hub
             var memberType = RetrieveMemberType();
             var id = RetrieveId();
             var displayName = RetrieveDisplayName();
-            var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
-            await Clients.Group(roomIdString).SendAsync("ParticipantDisconnected", participantDto);
             await _roomManagerService.RemoveParticipantFromRoom(roomId, id);
+            var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
+            var newParticipantsList = _roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
+            var participantsChanged =
+                new ParticipantsChangedDto(participantDto, newParticipantsList);
+            await Clients.GroupExcept(roomIdString, new []{this.Context.ConnectionId}).SendAsync("ParticipantDisconnected", participantsChanged);
         }
         
         await base.OnDisconnectedAsync(exception);

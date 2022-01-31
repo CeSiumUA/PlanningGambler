@@ -62,7 +62,7 @@ public class RoomsController : ControllerBase
     [HttpGet("verify")]
     public async Task<IActionResult> Verify()
     {
-        var roomId = Guid.Parse(this.HttpContext.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+        var roomId = Guid.Parse(this.HttpContext.User.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value);
         var room = _roomStorage.GetRoom(roomId);
         if (room == null) return NotFound();
         return Ok();
