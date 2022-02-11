@@ -1,5 +1,6 @@
 ﻿@using PlanningGambler.Front.Services.Abstract
 @using Blazored.LocalStorage
+@inject NavigationManager _navigationManager
 @inject IMatDialogService _matDialogService
 @inject IRoomConnectionProvider _roomConnectionProvider
 @inject ILocalStorageService _localStorageService
@@ -35,5 +36,6 @@
         var token = await _roomConnectionProvider.JoinRoom(Guid.Parse(_roomId), _roomDisplayName, string.IsNullOrEmpty(_roomPassword) ? null : _roomPassword);
         await _localStorageService.SetItemAsync("auth_token", token);
         DialogReference?.Close("Closed");
+        _navigationManager.NavigateTo("/room");
     }
 }

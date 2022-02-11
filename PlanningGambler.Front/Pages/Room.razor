@@ -2,10 +2,12 @@
 @inject IRoomConnectionProvider _roomConnectionProvider
 @inject IMatDialogService _matDialogService
 @inject ILocalStorageService _localStorageService
+@inject HubConnectionService _hubConnectionService
 @page "/room"
 @using Microsoft.AspNetCore.WebUtilities
 @using PlanningGambler.Front.Services.Abstract
 @using Blazored.LocalStorage
+@using PlanningGambler.Front.Services.Concrete
 @using PlanningGambler.Shared.Dtos
 
 <PageTitle>Planning Room</PageTitle>
@@ -25,30 +27,40 @@
 
         var parsedQuery = QueryHelpers.ParseNullableQuery(uri.Query);
 
-        if (parsedQuery.TryGetValue("id", out var id))
+        if (parsedQuery != null)
         {
-            this.RoomId = id.First();
-        }
-
-        if (parsedQuery.TryGetValue("password", out var password))
-        {
-            this.RoomPassword = password.First();
-        }
-
-        if (_roomToken == null && RoomId != null)
-        {
-            var displayName = await _matDialogService.PromptAsync("Please, enter name");
-            if (!string.IsNullOrEmpty(displayName))
+            if (parsedQuery.TryGetValue("id", out var id))
             {
-                _roomToken = await _roomConnectionProvider.JoinRoom(Guid.Parse(RoomId), displayName, RoomPassword);
-                await _localStorageService.SetItemAsync("auth_token", _roomToken);
+                this.RoomId = id.First();
             }
-            else
+
+            if (parsedQuery.TryGetValue("password", out var password))
             {
-                _navigationManager.NavigateTo("/");
+                this.RoomPassword = password.First();
+            }
+
+            if (_roomToken == null && RoomId != null)
+            {
+                var displayName = await _matDialogService.PromptAsync("Please, enter name");
+                if (!string.IsNullOrEmpty(displayName))
+                {
+                    _roomToken = await _roomConnectionProvider.JoinRoom(Guid.Parse(RoomId), displayName, RoomPassword);
+                    await _localStorageService.SetItemAsync("auth_token", _roomToken);
+                }
+                else
+                {
+                    _navigationManager.NavigateTo("/");
+                    return;
+                }
             }
         }
 
+        if (_roomToken == null)
+        {
+            _navigationManager.NavigateTo("/");
+            return;
+        }
+        await _hubConnectionService.StartConnection(_roomToken!.Token);
         await base.OnInitializedAsync();
     }
 
