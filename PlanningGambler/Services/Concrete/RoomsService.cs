@@ -6,6 +6,8 @@ using PlanningGambler.Models;
 using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Models.Rooms;
 using PlanningGambler.Services.Abstract;
+using PlanningGambler.Shared.Models;
+using PlanningGambler.Shared.Models.Rooms;
 
 namespace PlanningGambler.Services.Concrete;
 

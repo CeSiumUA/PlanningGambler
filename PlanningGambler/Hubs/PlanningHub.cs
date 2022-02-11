@@ -6,6 +6,7 @@ using PlanningGambler.Dtos.Requests;
 using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
+using PlanningGambler.Shared.Models;
 
 namespace PlanningGambler.Hubs;
 

@@ -1,4 +1,7 @@
-﻿namespace PlanningGambler.Models.Rooms;
+﻿using PlanningGambler.Shared.Models;
+using PlanningGambler.Shared.Models.Rooms;
+
+namespace PlanningGambler.Models.Rooms;
 
 public class Room
 {

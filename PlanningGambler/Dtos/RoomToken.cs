@@ -1,4 +1,5 @@
 ﻿using PlanningGambler.Models;
+using PlanningGambler.Shared.Models;
 
 namespace PlanningGambler.Dtos;
 

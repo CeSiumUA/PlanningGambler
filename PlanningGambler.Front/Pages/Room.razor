@@ -1,0 +1,55 @@
+﻿@inject NavigationManager _navigationManager
+@inject IRoomConnectionProvider _roomConnectionProvider
+@inject IMatDialogService _matDialogService
+@inject ILocalStorageService _localStorageService
+@page "/room"
+@using Microsoft.AspNetCore.WebUtilities
+@using PlanningGambler.Front.Services.Abstract
+@using Blazored.LocalStorage
+@using PlanningGambler.Shared.Dtos
+
+<PageTitle>Planning Room</PageTitle>
+
+@code {
+    [Parameter]
+    public string? RoomId { get; set; }
+    [Parameter]
+    public string? RoomPassword { get; set; }
+
+    private RoomToken? _roomToken { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _roomToken = await _localStorageService.GetItemAsync<RoomToken?>("auth_token");
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+
+        var parsedQuery = QueryHelpers.ParseNullableQuery(uri.Query);
+
+        if (parsedQuery.TryGetValue("id", out var id))
+        {
+            this.RoomId = id.First();
+        }
+
+        if (parsedQuery.TryGetValue("password", out var password))
+        {
+            this.RoomPassword = password.First();
+        }
+
+        if (_roomToken == null && RoomId != null)
+        {
+            var displayName = await _matDialogService.PromptAsync("Please, enter name");
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                _roomToken = await _roomConnectionProvider.JoinRoom(Guid.Parse(RoomId), displayName, RoomPassword);
+                await _localStorageService.SetItemAsync("auth_token", _roomToken);
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/");
+            }
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+}

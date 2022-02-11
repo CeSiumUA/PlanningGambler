@@ -1,17 +1,51 @@
-﻿@inherits LayoutComponentBase
+﻿@using PlanningGambler.Front.Services.Abstract
+@using PlanningGambler.Front.Pages.Dialogs
+@inherits LayoutComponentBase
+@inject IMatDialogService matDialogService
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
+        <MatFAB style="position: fixed; right: 50px; bottom: 50px; z-index: 2;" OnClick="@ChangeMenuState" RefBack="buttonForwardRef" Icon="@GetButtonIcon()"></MatFAB>
+        <MatMenu @ref="Menu" TargetForwardRef="@buttonForwardRef">
+            <MatList>
+                <MatListItem OnClick="@(_ => JoinRoom())">Join</MatListItem>
+                <MatListItem OnClick="@(_ => CreateRoom())">Create</MatListItem>
+                <MatListItem OnClick="@(_ => CloseMenu())">Close</MatListItem>
+            </MatList>
+        </MatMenu>
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code
+{
+    ForwardRef buttonForwardRef = new ForwardRef();
+    MatMenu Menu;
+
+    public async Task CreateRoom()
+    {
+        await matDialogService.OpenAsync(typeof(CreateRoomDialog), null);
+    }
+
+    public async Task JoinRoom()
+    {
+        await matDialogService.OpenAsync(typeof(JoinRoomDialog), null);
+    }
+
+    private string GetButtonIcon()
+    {
+        return MatIconNames.Play_arrow;
+    }
+
+    private async Task ChangeMenuState()
+    {
+        await Menu.OpenAsync();
+    }
+
+    private async Task CloseMenu()
+    {
+        await Menu.CloseAsync();
+    }
+}

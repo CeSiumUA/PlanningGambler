@@ -1,8 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using PlanningGambler.Models;
 using PlanningGambler.Shared.Models;
 
-namespace PlanningGambler.Dtos;
+namespace PlanningGambler.Shared.Dtos;
 
 public record ParticipantDto
 {

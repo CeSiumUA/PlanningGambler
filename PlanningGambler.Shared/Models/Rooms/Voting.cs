@@ -1,4 +1,4 @@
-﻿namespace PlanningGambler.Models.Rooms;
+﻿namespace PlanningGambler.Shared.Models.Rooms;
 
 public class Voting
 {

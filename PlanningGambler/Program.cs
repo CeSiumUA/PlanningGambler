@@ -59,6 +59,8 @@ builder.Services.AddScoped<IRoomManagerService, RoomsService>();
 builder.Services.AddSingleton<IRoomStorage, RoomStorageService>();
 builder.Services.AddScoped<TokenService>();
 
+builder.Services.AddSwaggerDocument();
+
 var app = builder.Build();
 
 app.UseCors(policyBuilder =>
@@ -70,6 +72,12 @@ app.UseCors(policyBuilder =>
 });
 
 app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi();
+    app.UseSwaggerUi3();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

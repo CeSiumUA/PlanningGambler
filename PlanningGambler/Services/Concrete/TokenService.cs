@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using PlanningGambler.Dtos;
 using PlanningGambler.Models;
+using PlanningGambler.Shared.Models;
 
 namespace PlanningGambler.Services.Concrete;
 

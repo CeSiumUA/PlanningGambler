@@ -1,4 +1,4 @@
-﻿namespace PlanningGambler.Models;
+﻿namespace PlanningGambler.Shared.Models;
 
 public record PlanningParticipant(
 Guid Id,
