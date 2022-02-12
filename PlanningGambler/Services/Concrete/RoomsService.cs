@@ -122,7 +122,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
 
     public HiddenVotingResult Vote(Guid roomId, Guid userId, int vote)
     {
-        if (VoteOption.VoteOptions.Any(x => x == vote))
+        if (!VoteOption.VoteOptions.Contains(vote))
         {
             throw new ArgumentException();
         }

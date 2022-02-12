@@ -12,10 +12,32 @@
 @using PlanningGambler.Dtos.Results
 @using PlanningGambler.Front.Services.Concrete
 @using PlanningGambler.Shared.Dtos
+@using PlanningGambler.Shared.Dtos.Results
 @using PlanningGambler.Shared.Models
 @using PlanningGambler.Shared.Models.Rooms
 
 <PageTitle>Planning Room</PageTitle>
+<MatFAB style="position: fixed; left: 50px; bottom: 50px; z-index: 2;" RefBack="menuRef" OnClick="OpenVoteMenu" Icon="@MatIconNames.Poll"></MatFAB>
+<MatMenu @ref="VoteMenu" TargetForwardRef="@menuRef">
+    <MatList>
+        @foreach (var voteOption in VoteOption.VoteOptions)
+        {
+            <MatListItem OnClick="@(_ => Vote(voteOption))">@voteOption</MatListItem>
+        }
+        <MatListItem style="color: red" OnClick="CloseVoteMenu">Close</MatListItem>
+    </MatList>
+</MatMenu>
+
+@if (_roomToken != null && _roomToken!.MemberType == MemberType.Administrator)
+{
+    <MatFAB style="position: fixed; right: 130px; bottom: 50px; z-index: 2;" OnClick="StartCountDown" Icon="@MatIconNames.Play_arrow"></MatFAB>
+}
+@if (_currentCountDown.HasValue)
+{
+    <div style="font-size: 600px; position: absolute; z-index: 2; opacity: 0.5; text-align: center; height: 100%; right: 50%; left: 50%">
+        @_currentCountDown.Value
+    </div>
+}
 @if (!string.IsNullOrEmpty(_snackBarMessage))
 {
     <MatSnackbar @bind-IsOpen="_snackBarOpen">
@@ -28,16 +50,40 @@
 
 @if (_roomInfo != null)
 {
+    <div style="float: left;">
+        @foreach (var participant in this._participants)
+        {
+            <MatCard style="width: 200px; margin-top: 20px; margin-bottom: 20px; margin-left: 20px; margin-right: 20px;">
+                <MatCardContent style="padding: 1rem;">
+                    <MatCardMedia Wide="true" style="font-size: 70px; text-align: center">
+                        @if (_hiddenResults.Contains(participant.Id))
+                        {
+                            @("?")
+                        }
+                        else
+                        {
+                            @(_voteResults.FirstOrDefault(x => x.UserId == participant.Id)?.Vote.ToString() ?? string.Empty)
+                        }
+                    </MatCardMedia>
+                    <MatHeadline6>@participant.DisplayName</MatHeadline6>
+                </MatCardContent>
+            </MatCard>
+        }
+    </div>
     <div style="float: right;">
         <MatList>
             @foreach (var stage in _roomInfo!.Stages)
             {
                 <MatListItem OnClick="() => SelectCurrentStage(stage.Id)">
                     <MatListItemText>
-                        <MatListItemPrimaryText>@stage.Title</MatListItemPrimaryText>
                         @if (_roomInfo.CurrentStage != null && stage.Id == _roomInfo!.CurrentStage!.Id)
                         {
-                            <MatListItemSecondaryText>Current stage</MatListItemSecondaryText>
+                            <MatListItemPrimaryText style="color: green">@stage.Title</MatListItemPrimaryText>
+                            <MatListItemSecondaryText style="color: green">Current stage</MatListItemSecondaryText>
+                        }
+                        else
+                        {
+                            <MatListItemPrimaryText>@stage.Title</MatListItemPrimaryText>
                         }
                     </MatListItemText>
                 </MatListItem>
@@ -56,8 +102,12 @@
     [Parameter]
     public string? RoomPassword { get; set; }
 
+    public MatMenu? VoteMenu;
+
     private RoomToken? _roomToken;
     private RoomInfo? _roomInfo;
+
+    ForwardRef menuRef = new ForwardRef();
 
     #region SnackBar
     private bool _snackBarOpen = false;
@@ -67,7 +117,11 @@
     private const string SnackBarMessageFormat = "Client {0} has been {1}";
     #endregion
 
+    private int? _currentCountDown;
+
     private List<ParticipantDto> _participants = new();
+    private List<VotingResult> _voteResults = new();
+    private HashSet<Guid> _hiddenResults = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,6 +170,7 @@
         await _hubConnectionService.StartConnection(_roomToken!.Token);
         this.SubscribeToMessages();
         this._roomInfo = await _hubConnectionService.FetchRoom();
+        this._participants = _roomInfo!.Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType)).ToList();
         await base.OnInitializedAsync();
     }
 
@@ -133,23 +188,36 @@
         await _hubConnectionService.SelectStage(stageId);
     }
 
+    private async Task StartCountDown()
+    {
+        await _hubConnectionService.StartCountDown();
+    }
+
+    private async Task Vote(int vote)
+    {
+        await _hubConnectionService.Vote(vote);
+        logger.LogInformation("Vote sent!");
+    }
+
     private void SubscribeToMessages()
     {
         logger.LogInformation("Subscribing...");
         this._hubConnectionService.OnParticipantConnected += (sender, dto) =>
         {
-            logger.LogInformation("Client connected");
+            logger.LogInformation("Client connected, participants: {0}", string.Join(", ", dto.Participants.Select(x => x.DisplayName)));
             this._participants = dto.Participants.ToList();
             this._snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "connected");
             this._snackBarOpen = true;
+            logger.LogInformation("Current participants: {0}", string.Join(", ", _participants.Select(x => x.DisplayName)));
             this.StateHasChanged();
         };
         this._hubConnectionService.OnParticipantDisconnected += (sender, dto) =>
         {
-            logger.LogInformation("Client disconnected");
+            logger.LogInformation("Client disconnected, participants: {0}", string.Join(", ", dto.Participants.Select(x => x.DisplayName)));
             this._participants = dto.Participants.ToList();
             this._snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "disconnected");
             this._snackBarOpen = true;
+            logger.LogInformation("Current participants: {0}", string.Join(", ", _participants.Select(x => x.DisplayName)));
             this.StateHasChanged();
         };
         this._hubConnectionService.OnStageCreated += (sender, result) =>
@@ -165,6 +233,39 @@
             this._roomInfo!.CurrentStage = this._roomInfo!.Stages.First(x => x.Id == guid);
             this.StateHasChanged();
         };
+        this._hubConnectionService.OnCountDown += (sender, i) =>
+        {
+            this._currentCountDown = i;
+            this.StateHasChanged();
+        };
+        this._hubConnectionService.OnStageVotingResult += (sender, results) =>
+        {
+            this._currentCountDown = null;
+            this._hiddenResults.Clear();
+            if (results != null)
+            {
+                this._voteResults = results.ToList();
+            }
+            this.StateHasChanged();
+        };
+        this._hubConnectionService.OnParticipantVoted += (sender, result) =>
+        {
+            if (result != null)
+            {
+                this._hiddenResults.Add(result.UserId);
+            }
+            this.StateHasChanged();
+        };
+    }
+
+    private async Task OpenVoteMenu()
+    {
+        await VoteMenu?.OpenAsync();
+    }
+
+    private async Task CloseVoteMenu()
+    {
+        await VoteMenu?.CloseAsync();
     }
 
     private void CloseSnackBar()

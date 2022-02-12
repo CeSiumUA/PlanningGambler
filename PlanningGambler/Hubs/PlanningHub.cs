@@ -7,6 +7,7 @@ using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
 using PlanningGambler.Shared.Models;
+using PlanningGambler.Shared.Models.Rooms;
 
 namespace PlanningGambler.Hubs;
 
@@ -60,6 +61,7 @@ public class PlanningHub : Hub
         }
 
         var roomId = this.RetrieveRoomId();
+        var room = this._roomManagerService.GetRoom(roomId);
         for (int i = 5; i > 0; i--)
         {
             await this.Clients.Group(roomId.ToString()).SendAsync("CountDown", i);
@@ -79,7 +81,11 @@ public class PlanningHub : Hub
         }
 
         var roomId = this.RetrieveRoomId();
-        return this._roomManagerService.GetRoom(roomId);
+        var room = this._roomManagerService.GetRoom(roomId);
+        //var currentStage = room.CurrentStage != null
+        //    ? new PlanningStage(room.CurrentStage.Id, room.CurrentStage.Title, new(), room.CurrentStage.Deadline) : null;
+        //return new RoomInfo(room.RoomId, room.Participants, currentStage, room.Stages.Select(x => new PlanningStage(x.Id, x.Title, new(), )))
+        return room;
     }
 
     public async Task Vote(int vote)

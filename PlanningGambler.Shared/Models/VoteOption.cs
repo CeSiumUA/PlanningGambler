@@ -1,8 +1,8 @@
-﻿namespace PlanningGambler.Models;
+﻿namespace PlanningGambler.Shared.Models;
 
 public static class VoteOption
 {
-    public static int[] VoteOptions = new int[]
+    public static readonly int[] VoteOptions = new int[]
     {
         1,
         2,
