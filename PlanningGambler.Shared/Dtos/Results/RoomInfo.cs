@@ -6,6 +6,8 @@ namespace PlanningGambler.Dtos.Results;
 public record RoomInfo(
     Guid RoomId,
     PlanningParticipant[] Participants,
-    PlanningStage? CurrentStage,
-    PlanningStage[] Stages
-    );
+    List<PlanningStage> Stages
+)
+{
+    public PlanningStage? CurrentStage { get; set; }
+}

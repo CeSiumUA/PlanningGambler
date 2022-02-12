@@ -3,14 +3,52 @@
 @inject IMatDialogService _matDialogService
 @inject ILocalStorageService _localStorageService
 @inject HubConnectionService _hubConnectionService
+@inject IJSRuntime _jsRuntime
+@inject ILogger<Room> logger
 @page "/room"
 @using Microsoft.AspNetCore.WebUtilities
 @using PlanningGambler.Front.Services.Abstract
 @using Blazored.LocalStorage
+@using PlanningGambler.Dtos.Results
 @using PlanningGambler.Front.Services.Concrete
 @using PlanningGambler.Shared.Dtos
+@using PlanningGambler.Shared.Models
+@using PlanningGambler.Shared.Models.Rooms
 
 <PageTitle>Planning Room</PageTitle>
+@if (!string.IsNullOrEmpty(_snackBarMessage))
+{
+    <MatSnackbar @bind-IsOpen="_snackBarOpen">
+        <MatSnackbarContent>@_snackBarMessage</MatSnackbarContent>
+        <MatSnackbarActions>
+            <MatButton OnClick="CloseSnackBar" Raised="true">Ok</MatButton>
+        </MatSnackbarActions>
+    </MatSnackbar>
+}
+
+@if (_roomInfo != null)
+{
+    <div style="float: right;">
+        <MatList>
+            @foreach (var stage in _roomInfo!.Stages)
+            {
+                <MatListItem OnClick="() => SelectCurrentStage(stage.Id)">
+                    <MatListItemText>
+                        <MatListItemPrimaryText>@stage.Title</MatListItemPrimaryText>
+                        @if (_roomInfo.CurrentStage != null && stage.Id == _roomInfo!.CurrentStage!.Id)
+                        {
+                            <MatListItemSecondaryText>Current stage</MatListItemSecondaryText>
+                        }
+                    </MatListItemText>
+                </MatListItem>
+            }
+        </MatList>
+        @if (_roomToken!.MemberType == MemberType.Administrator)
+        {
+            <MatButton OnClick="CreateStage" Icon="@MatIconNames.Add"></MatButton>
+        }
+    </div>
+}
 
 @code {
     [Parameter]
@@ -18,7 +56,18 @@
     [Parameter]
     public string? RoomPassword { get; set; }
 
-    private RoomToken? _roomToken { get; set; }
+    private RoomToken? _roomToken;
+    private RoomInfo? _roomInfo;
+
+    #region SnackBar
+    private bool _snackBarOpen = false;
+
+    private string? _snackBarMessage;
+
+    private const string SnackBarMessageFormat = "Client {0} has been {1}";
+    #endregion
+
+    private List<ParticipantDto> _participants = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,8 +109,67 @@
             _navigationManager.NavigateTo("/");
             return;
         }
+        else
+        {
+            //TODO verify
+        }
         await _hubConnectionService.StartConnection(_roomToken!.Token);
+        this.SubscribeToMessages();
+        this._roomInfo = await _hubConnectionService.FetchRoom();
         await base.OnInitializedAsync();
     }
 
+    private async Task CreateStage()
+    {
+        var newStageName = await _matDialogService.PromptAsync("New stage name:");
+        if (!string.IsNullOrEmpty(newStageName?.Trim()) && _roomToken!.MemberType == MemberType.Administrator)
+        {
+            await _hubConnectionService.CreateStage(newStageName);
+        }
+    }
+
+    private async Task SelectCurrentStage(Guid stageId)
+    {
+        await _hubConnectionService.SelectStage(stageId);
+    }
+
+    private void SubscribeToMessages()
+    {
+        logger.LogInformation("Subscribing...");
+        this._hubConnectionService.OnParticipantConnected += (sender, dto) =>
+        {
+            logger.LogInformation("Client connected");
+            this._participants = dto.Participants.ToList();
+            this._snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "connected");
+            this._snackBarOpen = true;
+            this.StateHasChanged();
+        };
+        this._hubConnectionService.OnParticipantDisconnected += (sender, dto) =>
+        {
+            logger.LogInformation("Client disconnected");
+            this._participants = dto.Participants.ToList();
+            this._snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "disconnected");
+            this._snackBarOpen = true;
+            this.StateHasChanged();
+        };
+        this._hubConnectionService.OnStageCreated += (sender, result) =>
+        {
+            if (result != null)
+            {
+                this._roomInfo!.Stages.Add(new PlanningStage(result.Id, result.Title, new List<Voting>(), result.Deadline)); 
+                this.StateHasChanged();
+            }
+        };
+        this._hubConnectionService.OnStageSelected += (sender, guid) =>
+        {
+            this._roomInfo!.CurrentStage = this._roomInfo!.Stages.First(x => x.Id == guid);
+            this.StateHasChanged();
+        };
+    }
+
+    private void CloseSnackBar()
+    {
+        this._snackBarOpen = false;
+        this.StateHasChanged();
+    }
 }

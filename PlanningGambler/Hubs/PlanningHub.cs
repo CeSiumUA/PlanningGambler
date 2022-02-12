@@ -14,6 +14,7 @@ namespace PlanningGambler.Hubs;
 public class PlanningHub : Hub
 {
     private readonly IRoomManagerService _roomManagerService;
+
     public PlanningHub(IRoomManagerService roomManagerService)
     {
         this._roomManagerService = roomManagerService;
@@ -22,71 +23,95 @@ public class PlanningHub : Hub
     [Authorize(Roles = "Administrator")]
     public async Task CreateStage(CreateStageRequest createStageRequest)
     {
-        if(Context.User == null) return;
-        var roomId = RetrieveRoomId();
-        var createStageResult = _roomManagerService.CreateVotingStage(roomId, createStageRequest.Title, createStageRequest.Deadline);
-        if(createStageResult == null) return;
-        await Clients.Group(roomId.ToString()).SendAsync("StageCreated", createStageResult);
+        if (this.Context.User == null)
+        {
+            return;
+        }
+
+        var roomId = this.RetrieveRoomId();
+        var createStageResult = this._roomManagerService.CreateVotingStage(roomId, createStageRequest.Title, createStageRequest.Deadline);
+        if (createStageResult == null)
+        {
+            return;
+        }
+
+        await this.Clients.Group(roomId.ToString()).SendAsync("StageCreated", createStageResult);
     }
 
     [Authorize(Roles = "Administrator")]
     public async Task SelectStage(Guid stageId)
     {
-        if(Context.User == null) return;
-        var roomId = RetrieveRoomId();
-        _roomManagerService.SelectActiveStage(roomId, stageId);
-        await Clients.Group(roomId.ToString()).SendAsync("StageSelected", stageId);
+        if (this.Context.User == null)
+        {
+            return;
+        }
+
+        var roomId = this.RetrieveRoomId();
+        this._roomManagerService.SelectActiveStage(roomId, stageId);
+        await this.Clients.Group(roomId.ToString()).SendAsync("StageSelected", stageId);
     }
 
     [Authorize(Roles = "Administrator")]
     public async Task StartCountDown()
     {
-        if(Context.User == null) return;
-        var roomId = RetrieveRoomId();
-        for(int i = 5; i > 0; i--)
+        if (this.Context.User == null)
         {
-            await Clients.Group(roomId.ToString()).SendAsync("CountDown", i);
+            return;
+        }
+
+        var roomId = this.RetrieveRoomId();
+        for (int i = 5; i > 0; i--)
+        {
+            await this.Clients.Group(roomId.ToString()).SendAsync("CountDown", i);
             await Task.Delay(1000);
         }
 
-        var votes = _roomManagerService.GetStageVotes(roomId).ToArray();
-        await Clients.Group(roomId.ToString()).SendAsync("StageVotingResult", votes);
+        var votes = this._roomManagerService.GetStageVotes(roomId).ToArray();
+        await this.Clients.Group(roomId.ToString()).SendAsync("StageVotingResult", votes);
     }
     #endregion
 
     public async Task<RoomInfo?> FetchRoom()
     {
-        if(Context.User == null) return null;
-        var roomId = RetrieveRoomId();
-        return _roomManagerService.GetRoom(roomId);
+        if (this.Context.User == null)
+        {
+            return null;
+        }
+
+        var roomId = this.RetrieveRoomId();
+        return this._roomManagerService.GetRoom(roomId);
     }
-    
+
     public async Task Vote(int vote)
     {
-        if(Context.User == null) return;
-        var roomId = RetrieveRoomId();
-        var userId = RetrieveId();
-        var votingResult = _roomManagerService.Vote(roomId, userId, vote);
-        await Clients.Group(roomId.ToString()).SendAsync("ParticipantVoted", votingResult);
+        if (this.Context.User == null)
+        {
+            return;
+        }
+
+        var roomId = this.RetrieveRoomId();
+        var userId = this.RetrieveId();
+        var votingResult = this._roomManagerService.Vote(roomId, userId, vote);
+        await this.Clients.Group(roomId.ToString()).SendAsync("ParticipantVoted", votingResult);
     }
     
     public override async Task OnConnectedAsync()
     {
-        if (Context.User != null)
+        if (this.Context.User != null)
         {
-            var roomId = RetrieveRoomId();
+            var roomId = this.RetrieveRoomId();
             var roomIdString = roomId.ToString();
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomIdString);
-            var memberType = RetrieveMemberType();
-            var id = RetrieveId();
-            var displayName = RetrieveDisplayName();
+            await this.Groups.AddToGroupAsync(Context.ConnectionId, roomIdString);
+            var memberType = this.RetrieveMemberType();
+            var id = this.RetrieveId();
+            var displayName = this.RetrieveDisplayName();
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
             var participant = new PlanningParticipant(id, displayName ?? string.Empty, memberType, roomId);
-            await _roomManagerService.AddParticipantToRoom(participant);
-            var newParticipantsList = _roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
+            await this._roomManagerService.AddParticipantToRoom(participant);
+            var newParticipantsList = this._roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
             var participantsChanged =
                 new ParticipantsChangedDto(participantDto, newParticipantsList);
-            await Clients.GroupExcept(roomIdString, new []{this.Context.ConnectionId}).SendAsync("ParticipantConnected", participantsChanged);
+            await this.Clients.GroupExcept(roomIdString, new[] { this.Context.ConnectionId }).SendAsync("ParticipantConnected", participantsChanged);
         }
 
         await base.OnConnectedAsync();
@@ -94,41 +119,44 @@ public class PlanningHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (Context.User != null)
+        if (this.Context.User != null)
         {
-            var roomId = RetrieveRoomId();
+            var roomId = this.RetrieveRoomId();
             var roomIdString = roomId.ToString();
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomIdString);
-            var memberType = RetrieveMemberType();
-            var id = RetrieveId();
-            var displayName = RetrieveDisplayName();
-            await _roomManagerService.RemoveParticipantFromRoom(roomId, id);
+            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, roomIdString);
+            var memberType = this.RetrieveMemberType();
+            var id = this.RetrieveId();
+            var displayName = this.RetrieveDisplayName();
+            await this._roomManagerService.RemoveParticipantFromRoom(roomId, id);
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
-            var newParticipantsList = _roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
+            var newParticipantsList = this._roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
             var participantsChanged =
                 new ParticipantsChangedDto(participantDto, newParticipantsList);
-            await Clients.GroupExcept(roomIdString, new []{this.Context.ConnectionId}).SendAsync("ParticipantDisconnected", participantsChanged);
+            await this.Clients.GroupExcept(roomIdString, new[] { this.Context.ConnectionId }).SendAsync("ParticipantDisconnected", participantsChanged);
         }
-        
+
         await base.OnDisconnectedAsync(exception);
     }
 
     private Guid RetrieveRoomId()
     {
-        var roomId = Context.User?.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value;
+        var roomId = this.Context.User?.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value;
         if (string.IsNullOrEmpty(roomId))
         {
             return Guid.Empty;
         }
+
         return Guid.Parse(roomId);
     }
+
     private string? RetrieveDisplayName()
     {
-        return Context.User?.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+        return this.Context.User?.Claims.First(x => x.Type == ClaimTypes.Name).Value;
     }
+
     private Guid RetrieveId()
     {
-        var id = Context.User?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        var id = this.Context.User?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         if (string.IsNullOrEmpty(id))
         {
             return Guid.Empty;
@@ -136,9 +164,10 @@ public class PlanningHub : Hub
 
         return Guid.Parse(id);
     }
+
     private MemberType RetrieveMemberType()
     {
-        var memberString = Context.User?.Claims.First(x => x.Type == ClaimTypes.Role).Value;
+        var memberString = this.Context.User?.Claims.First(x => x.Type == ClaimTypes.Role).Value;
         if (string.IsNullOrEmpty(memberString))
         {
             return MemberType.Participant;
