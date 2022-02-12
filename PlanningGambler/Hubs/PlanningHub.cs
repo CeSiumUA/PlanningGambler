@@ -139,6 +139,10 @@ public class PlanningHub : Hub
             var participantsChanged =
                 new ParticipantsChangedDto(participantDto, newParticipantsList);
             await this.Clients.GroupExcept(roomIdString, new[] { this.Context.ConnectionId }).SendAsync("ParticipantDisconnected", participantsChanged);
+            if (!_roomManagerService.GetRoomParticipants(roomId).Any())
+            {
+                _roomManagerService.RemoveRoom(roomId);
+            }
         }
 
         await base.OnDisconnectedAsync(exception);

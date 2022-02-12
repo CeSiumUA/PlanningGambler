@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Options;
 using PlanningGambler.Dtos.Results;
+using PlanningGambler.Front.Options;
 using PlanningGambler.Shared.Dtos;
 using PlanningGambler.Shared.Dtos.Requests;
 using PlanningGambler.Shared.Dtos.Results;
@@ -28,11 +30,11 @@ namespace PlanningGambler.Front.Services.Concrete
 
         private readonly ILogger<HubConnectionService> _logger;
 
-        public HubConnectionService(ILogger<HubConnectionService> logger)
+        public HubConnectionService(ILogger<HubConnectionService> logger, IConfiguration configuration)
         {
             this._logger = logger;
             this._hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:7049/planninghub", options =>
+                .WithUrl($"{configuration["ApiOptions:ApiUrl"]}/planninghub", options =>
                 {
                     options.AccessTokenProvider = async () => await this.RetrieveToken();
                 })
@@ -74,7 +76,7 @@ namespace PlanningGambler.Front.Services.Concrete
         public async Task StartConnection(string token)
         {
             this._token = token;
-            await this.RegisterHandlers();
+            this.RegisterHandlers();
             await this._hubConnection.StartAsync();
         }
 
@@ -83,7 +85,7 @@ namespace PlanningGambler.Front.Services.Concrete
             return Task.FromResult(this._token);
         }
 
-        private async Task RegisterHandlers()
+        private void RegisterHandlers()
         {
             this._logger.LogInformation("Registering handlers");
             this._hubConnection.On<NewStageResult?>("StageCreated", x =>

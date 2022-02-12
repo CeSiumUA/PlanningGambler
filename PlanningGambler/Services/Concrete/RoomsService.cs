@@ -182,4 +182,20 @@ public class RoomsService : IRoomsService, IRoomManagerService
             }
         }
     }
+
+    public IEnumerable<PlanningParticipant> GetRoomParticipants(Guid roomId)
+    {
+        var room = this._roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+
+        return room.Participants ?? new();
+    }
+
+    public void RemoveRoom(Guid roomId)
+    {
+        _roomStorage.RemoveRoom(roomId);
+    }
 }

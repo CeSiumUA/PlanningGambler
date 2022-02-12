@@ -14,4 +14,6 @@ public interface IRoomManagerService
     public HiddenVotingResult Vote(Guid roomId, Guid userId, int vote);
     public IEnumerable<VotingResult> GetStageVotes(Guid roomId);
     public RoomInfo GetRoom(Guid roomId);
+    public IEnumerable<PlanningParticipant> GetRoomParticipants(Guid roomId);
+    public void RemoveRoom(Guid roomId);
 }

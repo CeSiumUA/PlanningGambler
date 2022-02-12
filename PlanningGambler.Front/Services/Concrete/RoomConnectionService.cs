@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
+using PlanningGambler.Front.Options;
 using PlanningGambler.Front.Services.Abstract;
 using PlanningGambler.Shared.Dtos;
 using PlanningGambler.Shared.Dtos.Requests;
@@ -10,9 +12,10 @@ namespace PlanningGambler.Front.Services.Concrete
     {
         private readonly HttpClient _httpClient;
 
-        public RoomConnectionService(HttpClient httpClient)
+        public RoomConnectionService(HttpClient httpClient, IConfiguration configuration)
         {
             this._httpClient = httpClient;
+            this._httpClient.BaseAddress = new Uri(configuration["ApiOptions:ApiUrl"]);
         }
 
         public async Task<RoomToken?> CreateRoom(string displayName, string? password)

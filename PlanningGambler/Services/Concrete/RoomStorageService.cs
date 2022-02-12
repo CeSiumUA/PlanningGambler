@@ -1,5 +1,6 @@
 ﻿using PlanningGambler.Models.Rooms;
 using PlanningGambler.Services.Abstract;
+using System.Linq;
 
 namespace PlanningGambler.Services.Concrete;
 
@@ -15,5 +16,15 @@ public class RoomStorageService : IRoomStorage
     public Room? GetRoom(Guid id)
     {
         return _rooms.FirstOrDefault(x => x.Id == id);
+    }
+
+    public void RemoveRoom(Guid id)
+    {
+        var existingRoom = _rooms.FirstOrDefault();
+        if (existingRoom == null)
+        {
+            return;
+        }
+        _rooms.Remove(existingRoom);
     }
 }
