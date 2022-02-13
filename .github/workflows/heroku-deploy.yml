@@ -19,3 +19,4 @@ jobs:
         heroku_app_name: "planning-gambler"
         heroku_email: "fedir.katushonok@gmail.com"
         usedocker: true
+        remote_branch: master
