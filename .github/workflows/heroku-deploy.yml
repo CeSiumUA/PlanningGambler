@@ -13,15 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+    - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
       with:
-        dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build docker Image
-      run: docker build -t planning-gambler .
-    - name: Push to heroku
-      run: heroku container:push -a planning-gambler web
-    - name: Release on Heroku
-      run: heroku container:release -a planning-gambler web
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: "planning-gambler"
+        heroku_email: "fedir.katushonok@gmail.com"
+        usedocker: true
