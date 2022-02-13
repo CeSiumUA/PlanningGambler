@@ -6,5 +6,6 @@ namespace PlanningGambler.Front.Services.Abstract
     {
         public Task<RoomToken?> JoinRoom(Guid roomId, string displayName, string? password = null);
         public Task<RoomToken?> CreateRoom(string displayName, string? password);
+        public Task<bool> Verify(string token);
     }
 }

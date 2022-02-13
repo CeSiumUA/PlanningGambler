@@ -64,7 +64,7 @@ namespace PlanningGambler.Front.Services.Concrete
 
         public async Task Vote(int vote)
         {
-            await this._hubConnection.SendAsync("Vote", vote);
+            await this._hubConnection.InvokeAsync("Vote", vote);
         }
 
         public async ValueTask DisposeAsync()

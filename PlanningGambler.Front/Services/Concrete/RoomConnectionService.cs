@@ -57,5 +57,18 @@ namespace PlanningGambler.Front.Services.Concrete
             await using var responseStream = await response.Content.ReadAsStreamAsync();
             return await JsonSerializer.DeserializeAsync<RoomToken>(responseStream);
         }
+
+        public async Task<bool> Verify(string token)
+        {
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "api/rooms/verify");
+            httpRequestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse($"Bearer {token}");
+            using var response = await _httpClient.SendAsync(httpRequestMessage);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

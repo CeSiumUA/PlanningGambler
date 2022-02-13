@@ -15,9 +15,11 @@
 @using PlanningGambler.Shared.Dtos.Results
 @using PlanningGambler.Shared.Models
 @using PlanningGambler.Shared.Models.Rooms
+@using System.Runtime.CompilerServices
 
 <PageTitle>Planning Room</PageTitle>
 <MatFAB style="position: fixed; left: 50px; bottom: 50px; z-index: 2;" RefBack="menuRef" OnClick="OpenVoteMenu" Icon="@MatIconNames.Poll"></MatFAB>
+<MatFAB style="position: fixed; left: 130px; bottom: 50px; z-index: 2;" RefBack="menuRef" OnClick="OpenShareDialog" Icon="@MatIconNames.Share"></MatFAB>
 <MatMenu @ref="VoteMenu" TargetForwardRef="@menuRef">
     <MatList>
         @foreach (var voteOption in VoteOption.VoteOptions)
@@ -142,7 +144,7 @@
                 this.RoomPassword = password.First();
             }
 
-            if (_roomToken == null && RoomId != null)
+            if ((_roomToken == null || !(await _roomConnectionProvider.Verify(_roomToken.Token))) && RoomId != null)
             {
                 var displayName = await _matDialogService.PromptAsync("Please, enter name");
                 if (!string.IsNullOrEmpty(displayName))
@@ -165,7 +167,12 @@
         }
         else
         {
-            //TODO verify
+            var verified = await _roomConnectionProvider.Verify(_roomToken.Token);
+            if (!verified)
+            {
+                _navigationManager.NavigateTo("/");
+                return;
+            }
         }
         await _hubConnectionService.StartConnection(_roomToken!.Token);
         this.SubscribeToMessages();
@@ -195,8 +202,17 @@
 
     private async Task Vote(int vote)
     {
-        await _hubConnectionService.Vote(vote);
-        logger.LogInformation("Vote sent!");
+        try
+        {
+            await _hubConnectionService.Vote(vote);
+            logger.LogInformation("Vote sent!");
+        }
+        catch
+        {
+            await _matDialogService.AlertAsync("Can not vote! Please, try selecting a stage to vote for, or try again later");
+            logger.LogError("Vote error");
+        }
+        
     }
 
     private void SubscribeToMessages()
@@ -261,6 +277,11 @@
     private async Task OpenVoteMenu()
     {
         await VoteMenu?.OpenAsync();
+    }
+
+    private async Task OpenShareDialog()
+    {
+        await _matDialogService.AlertAsync(new Uri($"{_navigationManager.BaseUri}room?id={_roomToken!.RoomId}").AbsoluteUri);
     }
 
     private async Task CloseVoteMenu()
