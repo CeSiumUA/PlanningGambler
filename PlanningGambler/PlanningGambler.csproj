@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.2" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
       <PackageReference Include="NSwag.AspNetCore" Version="13.15.9" />
     </ItemGroup>
@@ -18,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\PlanningGambler.Front\PlanningGambler.Front.csproj" />
       <ProjectReference Include="..\PlanningGambler.Shared\PlanningGambler.Shared.csproj" />
     </ItemGroup>
 

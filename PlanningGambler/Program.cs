@@ -77,11 +77,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi();
     app.UseSwaggerUi3();
+    app.UseWebAssemblyDebugging();
 }
+
+app.UseStaticFiles();
+app.UseBlazorFrameworkFiles();
+
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<PlanningHub>("/planninghub");
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapFallbackToFile("index.html");
+});
 
 app.Run();
