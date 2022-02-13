@@ -1,4 +1,4 @@
-name: .NET
+name: Heroku deploy
 
 on:
   push:
