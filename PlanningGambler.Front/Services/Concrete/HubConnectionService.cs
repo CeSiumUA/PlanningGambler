@@ -57,9 +57,9 @@ namespace PlanningGambler.Front.Services.Concrete
             await this._hubConnection.SendAsync("StartCountDown");
         }
 
-        public async Task<RoomInfo?> FetchRoom()
+        public async Task<RoomDto?> FetchRoom()
         {
-            return await this._hubConnection.InvokeAsync<RoomInfo?>("FetchRoom");
+            return await this._hubConnection.InvokeAsync<RoomDto?>("FetchRoom");
         }
 
         public async Task Vote(int vote)

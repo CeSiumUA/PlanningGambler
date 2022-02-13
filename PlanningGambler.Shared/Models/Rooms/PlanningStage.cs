@@ -5,4 +5,7 @@ public record PlanningStage(
     string Title,
     List<Voting> Votes,
     DateTimeOffset? Deadline
-);
+)
+{
+    public bool AreResultsVisible { get; set; } = false;
+}

@@ -6,6 +6,7 @@ using PlanningGambler.Dtos.Requests;
 using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
+using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
 using PlanningGambler.Shared.Models.Rooms;
 
@@ -73,7 +74,7 @@ public class PlanningHub : Hub
     }
     #endregion
 
-    public async Task<RoomInfo?> FetchRoom()
+    public async Task<RoomDto?> FetchRoom()
     {
         if (this.Context.User == null)
         {
@@ -85,7 +86,14 @@ public class PlanningHub : Hub
         //var currentStage = room.CurrentStage != null
         //    ? new PlanningStage(room.CurrentStage.Id, room.CurrentStage.Title, new(), room.CurrentStage.Deadline) : null;
         //return new RoomInfo(room.RoomId, room.Participants, currentStage, room.Stages.Select(x => new PlanningStage(x.Id, x.Title, new(), )))
-        return room;
+        return new RoomDto(room.RoomId,
+            room.Participants,
+            room.Stages.Select(x => new NewStageResult(x.Id, x.Title, x.Deadline)).ToList())
+        {
+            CurrentStage = room.CurrentStage == null
+                ? null
+                : new NewStageResult(room.CurrentStage.Id, room.CurrentStage.Title, room.CurrentStage.Deadline)
+        };
     }
 
     public async Task Vote(int vote)

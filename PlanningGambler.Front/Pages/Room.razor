@@ -107,7 +107,7 @@
     public MatMenu? VoteMenu;
 
     private RoomToken? _roomToken;
-    private RoomInfo? _roomInfo;
+    private RoomDto? _roomInfo;
 
     ForwardRef menuRef = new ForwardRef();
 
@@ -240,13 +240,14 @@
         {
             if (result != null)
             {
-                this._roomInfo!.Stages.Add(new PlanningStage(result.Id, result.Title, new List<Voting>(), result.Deadline)); 
+                this._roomInfo!.Stages.Add(new NewStageResult(result.Id, result.Title, result.Deadline)); 
                 this.StateHasChanged();
             }
         };
         this._hubConnectionService.OnStageSelected += (sender, guid) =>
         {
             this._roomInfo!.CurrentStage = this._roomInfo!.Stages.First(x => x.Id == guid);
+            this._voteResults = new List<VotingResult>();
             this.StateHasChanged();
         };
         this._hubConnectionService.OnCountDown += (sender, i) =>
