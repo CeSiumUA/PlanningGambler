@@ -12,10 +12,9 @@ namespace PlanningGambler.Front.Services.Concrete
     {
         private readonly HttpClient _httpClient;
 
-        public RoomConnectionService(HttpClient httpClient, IConfiguration configuration)
+        public RoomConnectionService(HttpClient httpClient)
         {
             this._httpClient = httpClient;
-            this._httpClient.BaseAddress = new Uri(configuration["ApiOptions:ApiUrl"]);
         }
 
         public async Task<RoomToken?> CreateRoom(string displayName, string? password)

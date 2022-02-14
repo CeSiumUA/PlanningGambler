@@ -14,27 +14,27 @@ namespace PlanningGambler.Front.Services.Concrete
 
         private string? _token;
 
-        public event EventHandler<NewStageResult?> OnStageCreated;
+        public event EventHandler<NewStageResult?>? OnStageCreated;
 
-        public event EventHandler<Guid> OnStageSelected;
+        public event EventHandler<Guid>? OnStageSelected;
 
-        public event EventHandler<int> OnCountDown;
+        public event EventHandler<int>? OnCountDown;
 
-        public event EventHandler<VotingResult[]?> OnStageVotingResult;
+        public event EventHandler<VotingResult[]?>? OnStageVotingResult;
 
-        public event EventHandler<HiddenVotingResult?> OnParticipantVoted;
+        public event EventHandler<HiddenVotingResult?>? OnParticipantVoted;
 
-        public event EventHandler<ParticipantsChangedDto> OnParticipantConnected;
+        public event EventHandler<ParticipantsChangedDto>? OnParticipantConnected;
 
-        public event EventHandler<ParticipantsChangedDto> OnParticipantDisconnected;
+        public event EventHandler<ParticipantsChangedDto>? OnParticipantDisconnected;
 
-        private readonly ILogger<HubConnectionService> _logger;
+        private readonly ILogger<HubConnectionService>? _logger;
 
-        public HubConnectionService(ILogger<HubConnectionService> logger, IConfiguration configuration)
+        public HubConnectionService(ILogger<HubConnectionService> logger, HttpClient httpClient)
         {
             this._logger = logger;
             this._hubConnection = new HubConnectionBuilder()
-                .WithUrl($"{configuration["ApiOptions:ApiUrl"]}/planninghub", options =>
+                .WithUrl($"{httpClient.BaseAddress}planninghub", options =>
                 {
                     options.AccessTokenProvider = async () => await this.RetrieveToken();
                 })

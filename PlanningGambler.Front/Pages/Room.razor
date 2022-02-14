@@ -95,6 +95,11 @@
         {
             <MatButton OnClick="CreateStage" Icon="@MatIconNames.Add"></MatButton>
         }
+        @if (_average != null && _mostRecent != null)
+        {
+            <p>Average: @_average</p>
+            <p>Most votes: @_mostRecent</p>
+        }
     </div>
 }
 
@@ -110,6 +115,9 @@
     private RoomDto? _roomInfo;
 
     ForwardRef menuRef = new ForwardRef();
+
+    private double? _average = null;
+    private int? _mostRecent = null;
 
     #region SnackBar
     private bool _snackBarOpen = false;
@@ -248,6 +256,8 @@
         {
             this._roomInfo!.CurrentStage = this._roomInfo!.Stages.First(x => x.Id == guid);
             this._voteResults = new List<VotingResult>();
+            this._average = null;
+            this._mostRecent = null;
             this.StateHasChanged();
         };
         this._hubConnectionService.OnCountDown += (sender, i) =>
@@ -259,10 +269,17 @@
         {
             this._currentCountDown = null;
             this._hiddenResults.Clear();
+            logger.LogInformation("Got vote results: {0}", string.Join(", ", results.Select(x => x.Vote)));
             if (results != null)
             {
                 this._voteResults = results.ToList();
+                var numericResults = _voteResults.Select(x => x.Vote);
+                this._average = numericResults!.Select(x => (double)x).Average();
+                var votesGrouping = numericResults!.GroupBy(x => x);
+                var maxVotes = votesGrouping.Max(x => x.Count());
+                this._mostRecent = votesGrouping.FirstOrDefault(x => x.Count() == maxVotes)?.Key;
             }
+            logger.LogInformation("Changed results");
             this.StateHasChanged();
         };
         this._hubConnectionService.OnParticipantVoted += (sender, result) =>
