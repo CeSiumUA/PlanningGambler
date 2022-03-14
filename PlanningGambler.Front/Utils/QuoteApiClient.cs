@@ -842,7 +842,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 400)
@@ -917,7 +917,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         {
@@ -1233,7 +1233,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         {
@@ -1321,7 +1321,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         {
@@ -1415,7 +1415,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 400)
@@ -1521,7 +1521,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 400)
@@ -1622,7 +1622,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -1723,7 +1723,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -1830,7 +1830,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2093,7 +2093,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2182,7 +2182,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2277,7 +2277,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2366,7 +2366,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2455,7 +2455,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2543,7 +2543,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2632,7 +2632,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2721,7 +2721,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2809,7 +2809,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2910,7 +2910,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -2992,7 +2992,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3099,7 +3099,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3282,7 +3282,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3377,7 +3377,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3465,7 +3465,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3559,7 +3559,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3708,7 +3708,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3802,7 +3802,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -3990,7 +3990,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4093,7 +4093,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4263,7 +4263,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4351,7 +4351,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4446,7 +4446,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4541,7 +4541,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4644,7 +4644,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4814,7 +4814,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4902,7 +4902,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -4997,7 +4997,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
@@ -5092,7 +5092,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return default(void)!;
+                            return;
                         }
                         else
                         if (status_ == 401)
