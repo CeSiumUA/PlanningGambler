@@ -5,7 +5,7 @@
 @inject HubConnectionService _hubConnectionService
 @inject IJSRuntime _jsRuntime
 @inject ILogger<Room> logger
-@inject IQuoteApiClient _quoteApiClient
+@inject IQuoteProvider _quoteProvider
 @page "/room"
 @using Microsoft.AspNetCore.WebUtilities
 @using PlanningGambler.Front.Services.Abstract
@@ -17,7 +17,6 @@
 @using PlanningGambler.Shared.Models
 @using PlanningGambler.Shared.Models.Rooms
 @using System.Runtime.CompilerServices
-@using QuoteApi
 
 <PageTitle>Planning Room</PageTitle>
 <MatFAB style="position: fixed; left: 50px; bottom: 50px; z-index: 2;" RefBack="menuRef" OnClick="OpenVoteMenu" Icon="@MatIconNames.Poll"></MatFAB>
@@ -38,9 +37,9 @@
 }
 @if (_currentCountDown.HasValue)
 {
-    <div style="font-size: 600px; position: absolute; z-index: 2; opacity: 0.5; text-align: center; height: 100%; right: 50%; left: 50%">
+    <div style="font-size: 600px; position: absolute; z-index: 2; opacity: 0.5; text-align: center; height: 100%; right: 0%; left: 0%">
         @_currentCountDown.Value
-        <p style="font-size: 12px;">@quoteOfTeDay</p>
+        <p style="font-size: 24px;left: 0%;right: 0%;position: fixed;bottom: 10%;">@_quoteOfTeDay</p>
     </div>
 }
 @if (!string.IsNullOrEmpty(_snackBarMessage))
@@ -100,7 +99,7 @@
         }
         @if (_average != null && _mostRecent != null)
         {
-            <p>Average: @string.Format("#.##", _average)</p>
+            <p>Average: @System.Math.Round((decimal)_average, 2)</p>
             <p>Most votes: @_mostRecent</p>
         }
     </div>
@@ -136,14 +135,14 @@
     private List<VotingResult> _voteResults = new();
     private HashSet<Guid> _hiddenResults = new();
 
-    private string? quoteOfTeDay = string.Empty;
+    private string? _quoteOfTeDay = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         _roomToken = await _localStorageService.GetItemAsync<RoomToken?>("auth_token");
         var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
 
-        //quoteOfTeDay = (await _quoteApiClient.QodAsync(null, "en"))?.Contents?.Quotes?.First()?.Quote;
+        _quoteOfTeDay = await _quoteProvider.GetQuoteOfTheDay();
 
         var parsedQuery = QueryHelpers.ParseNullableQuery(uri.Query);
 
