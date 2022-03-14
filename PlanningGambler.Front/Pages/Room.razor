@@ -100,7 +100,7 @@
         }
         @if (_average != null && _mostRecent != null)
         {
-            <p>Average: @_average</p>
+            <p>Average: @string.Format("#.##", _average)</p>
             <p>Most votes: @_mostRecent</p>
         }
     </div>
