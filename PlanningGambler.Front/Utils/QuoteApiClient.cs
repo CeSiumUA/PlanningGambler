@@ -660,17 +660,17 @@ namespace QuoteApi
     {
         private string _baseUrl = "https://quotes.rest";
         private System.Net.Http.HttpClient _httpClient;
-        private System.Lazy<System.Text.Json.JsonSerializerOptions> _settings;
+        private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
         public QuoteApiClient(System.Net.Http.HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _settings = new System.Lazy<System.Text.Json.JsonSerializerOptions>(CreateSerializerSettings);
+            _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
 
-        private System.Text.Json.JsonSerializerOptions CreateSerializerSettings()
+        private Newtonsoft.Json.JsonSerializerSettings CreateSerializerSettings()
         {
-            var settings = new System.Text.Json.JsonSerializerOptions();
+            var settings = new Newtonsoft.Json.JsonSerializerSettings();
             UpdateJsonSerializerSettings(settings);
             return settings;
         }
@@ -681,9 +681,9 @@ namespace QuoteApi
             set { _baseUrl = value; }
         }
 
-        protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
+        protected Newtonsoft.Json.JsonSerializerSettings JsonSerializerSettings { get { return _settings.Value; } }
 
-        partial void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings);
+        partial void UpdateJsonSerializerSettings(Newtonsoft.Json.JsonSerializerSettings settings);
 
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
@@ -842,7 +842,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 400)
@@ -917,7 +917,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         {
@@ -1233,7 +1233,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         {
@@ -1321,7 +1321,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         {
@@ -1415,7 +1415,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 400)
@@ -1521,7 +1521,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 400)
@@ -1622,7 +1622,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -1723,7 +1723,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -1830,7 +1830,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2093,7 +2093,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2182,7 +2182,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2277,7 +2277,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2366,7 +2366,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2455,7 +2455,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2543,7 +2543,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2632,7 +2632,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2721,7 +2721,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2809,7 +2809,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2910,7 +2910,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -2992,7 +2992,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3099,7 +3099,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3282,7 +3282,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3377,7 +3377,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3465,7 +3465,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3559,7 +3559,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3708,7 +3708,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3802,7 +3802,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -3990,7 +3990,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4093,7 +4093,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4263,7 +4263,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4351,7 +4351,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4446,7 +4446,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4541,7 +4541,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4644,7 +4644,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4814,7 +4814,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4902,7 +4902,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -4997,7 +4997,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -5092,7 +5092,7 @@ namespace QuoteApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            return;
+                            return;;
                         }
                         else
                         if (status_ == 401)
@@ -5153,10 +5153,10 @@ namespace QuoteApi
                 var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
                 {
-                    var typedBody = System.Text.Json.JsonSerializer.Deserialize<T>(responseText, JsonSerializerSettings);
+                    var typedBody = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(responseText, JsonSerializerSettings);
                     return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
-                catch (System.Text.Json.JsonException exception)
+                catch (Newtonsoft.Json.JsonException exception)
                 {
                     var message = "Could not deserialize the response body string as " + typeof(T).FullName + ".";
                     throw new QuoteApiException(message, (int)response.StatusCode, responseText, headers, exception);
@@ -5167,12 +5167,15 @@ namespace QuoteApi
                 try
                 {
                     using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                    using (var streamReader = new System.IO.StreamReader(responseStream))
+                    using (var jsonTextReader = new Newtonsoft.Json.JsonTextReader(streamReader))
                     {
-                        var typedBody = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerSettings, cancellationToken).ConfigureAwait(false);
+                        var serializer = Newtonsoft.Json.JsonSerializer.Create(JsonSerializerSettings);
+                        var typedBody = serializer.Deserialize<T>(jsonTextReader);
                         return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
-                catch (System.Text.Json.JsonException exception)
+                catch (Newtonsoft.Json.JsonException exception)
                 {
                     var message = "Could not deserialize the response body stream as " + typeof(T).FullName + ".";
                     throw new QuoteApiException(message, (int)response.StatusCode, string.Empty, headers, exception);
@@ -5229,29 +5232,18 @@ namespace QuoteApi
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class QuoteResponse
     {
-        [System.Text.Json.Serialization.JsonConstructor]
+        /// <summary>
+        /// Metadata about this successful call
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("success", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string? Success { get; set; } = default!;
 
-        public QuoteResponse(Contents? @contents, string? @success)
-
-        {
-
-            this.Success = @success;
-
-            this.Contents = @contents;
-
-        }    /// <summary>
-             /// Metadata about this successful call
-             /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("success")]
-        public string? Success { get; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("contents")]
-        public Contents? Contents { get; }
+        [Newtonsoft.Json.JsonProperty("contents", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public Contents? Contents { get; set; } = default!;
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
-        [System.Text.Json.Serialization.JsonExtensionData]
+        [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
@@ -5263,27 +5255,16 @@ namespace QuoteApi
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class QOD : Quote
     {
-        [System.Text.Json.Serialization.JsonConstructor]
-
-        public QOD(string? @author, string @date, string @id, string? @image, int? @length, string @quote, System.Collections.Generic.ICollection<string>? @tags)
-
-            : base(author, id, image, length, quote, tags)
-
-        {
-
-            this.Date = @date;
-
-        }    /// <summary>
-             /// Date this quote of the day belongs to
-             /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("date")]
+        /// <summary>
+        /// Date this quote of the day belongs to
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("date", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Date { get; }
+        public string Date { get; set; } = default!;
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
-        [System.Text.Json.Serialization.JsonExtensionData]
+        [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
@@ -5295,84 +5276,52 @@ namespace QuoteApi
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Quote : NewQuote
     {
-        [System.Text.Json.Serialization.JsonConstructor]
-
-        public Quote(string? @author, string @id, string? @image, int? @length, string @quote, System.Collections.Generic.ICollection<string>? @tags)
-
-            : base(author, quote, tags)
-
-        {
-
-            this.Id = @id;
-
-            this.Image = @image;
-
-            this.Length = @length;
-
-        }    /// <summary>
-             /// Unique identifier representing a specific quote in theysaidso.com.
-             /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        /// <summary>
+        /// Unique identifier representing a specific quote in theysaidso.com.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Id { get; }
+        public string Id { get; set; } = default!;
 
         /// <summary>
         /// Image URL that can be used for background to display this quote.
         /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("image")]
-        public string? Image { get; }
+        [Newtonsoft.Json.JsonProperty("image", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string? Image { get; set; } = default!;
 
         /// <summary>
         /// Length of the quote string.
         /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("length")]
-        public int? Length { get; }
+        [Newtonsoft.Json.JsonProperty("length", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int? Length { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class NewQuote
     {
-        [System.Text.Json.Serialization.JsonConstructor]
-
-        public NewQuote(string? @author, string @quote, System.Collections.Generic.ICollection<string>? @tags)
-
-        {
-
-            this.Author = @author;
-
-            this.Quote = @quote;
-
-            this.Tags = @tags;
-
-        }    /// <summary>
-             /// Author name of quote.
-             /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("author")]
-        public string? Author { get; }
+        /// <summary>
+        /// Author name of quote.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("author", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string? Author { get; set; } = default!;
 
         /// <summary>
         /// The Quote.
         /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("quote")]
+        [Newtonsoft.Json.JsonProperty("quote", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Quote { get; }
+        public string Quote { get; set; } = default!;
 
         /// <summary>
         /// Array of tags/categories.
         /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("tags")]
-        public System.Collections.Generic.ICollection<string>? Tags { get; }
+        [Newtonsoft.Json.JsonProperty("tags", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<string>? Tags { get; set; } = default!;
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
-        [System.Text.Json.Serialization.JsonExtensionData]
+        [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }
@@ -5384,24 +5333,15 @@ namespace QuoteApi
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Contents
     {
-        [System.Text.Json.Serialization.JsonConstructor]
-
-        public Contents(System.Collections.Generic.ICollection<Quote>? @quotes)
-
-        {
-
-            this.Quotes = @quotes;
-
-        }    /// <summary>
-             /// List of quotes
-             /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("quotes")]
-        public System.Collections.Generic.ICollection<Quote>? Quotes { get; }
+        /// <summary>
+        /// List of quotes
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("quotes", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.Generic.ICollection<Quote>? Quotes { get; set; } = default!;
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
-        [System.Text.Json.Serialization.JsonExtensionData]
+        [Newtonsoft.Json.JsonExtensionData]
         public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
         {
             get { return _additionalProperties; }

@@ -143,7 +143,7 @@
         _roomToken = await _localStorageService.GetItemAsync<RoomToken?>("auth_token");
         var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
 
-        quoteOfTeDay = (await _quoteApiClient.QodAsync(null, "en"))?.Contents?.Quotes?.First()?.Quote;
+        //quoteOfTeDay = (await _quoteApiClient.QodAsync(null, "en"))?.Contents?.Quotes?.First()?.Quote;
 
         var parsedQuery = QueryHelpers.ParseNullableQuery(uri.Query);
 
