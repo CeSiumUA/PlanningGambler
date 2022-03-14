@@ -7,6 +7,7 @@ using PlanningGambler.Front;
 using PlanningGambler.Front.Options;
 using PlanningGambler.Front.Services.Abstract;
 using PlanningGambler.Front.Services.Concrete;
+using QuoteApi;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -16,6 +17,10 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<IRoomConnectionProvider, RoomConnectionService>();
 builder.Services.AddScoped<HubConnectionService>();
+builder.Services.AddScoped<IQuoteApiClient>(sp => new QuoteApiClient(new HttpClient()
+{
+    BaseAddress = new Uri("https://quotes.rest")
+}));
 builder.Services.AddMatBlazor();
 builder.Services.AddBlazoredLocalStorage();
 
