@@ -63,7 +63,7 @@ public class PlanningHub : Hub
 
         var roomId = this.RetrieveRoomId();
         var room = this._roomManagerService.GetRoom(roomId);
-        for (int i = 5; i > 0; i--)
+        for (int i = 3; i > 0; i--)
         {
             await this.Clients.Group(roomId.ToString()).SendAsync("CountDown", i);
             await Task.Delay(1000);
