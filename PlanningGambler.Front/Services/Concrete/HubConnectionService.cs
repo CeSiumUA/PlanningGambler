@@ -62,7 +62,7 @@ namespace PlanningGambler.Front.Services.Concrete
             return await this._hubConnection.InvokeAsync<RoomDto?>("FetchRoom");
         }
 
-        public async Task Vote(int vote)
+        public async Task Vote(string vote)
         {
             await this._hubConnection.InvokeAsync("Vote", vote);
         }

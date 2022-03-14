@@ -66,7 +66,7 @@
                         }
                         else
                         {
-                            @(_voteResults.FirstOrDefault(x => x.UserId == participant.Id)?.Vote.ToString() ?? string.Empty)
+                            @GetVotingValue(_voteResults.FirstOrDefault(x => x.UserId == participant.Id)?.Vote);
                         }
                     </MatCardMedia>
                     <MatHeadline6>@participant.DisplayName</MatHeadline6>
@@ -97,9 +97,9 @@
         {
             <MatButton OnClick="CreateStage" Icon="@MatIconNames.Add"></MatButton>
         }
-        @if (_average != null && _mostRecent != null)
+        @if (_average.HasValue && _mostRecent.HasValue)
         {
-            <p>Average: @System.Math.Round((decimal)_average, 2)</p>
+            <p>Average: @System.Math.Round(_average.Value, 2)</p>
             <p>Most votes: @_mostRecent</p>
         }
     </div>
@@ -118,7 +118,7 @@
 
     ForwardRef menuRef = new ForwardRef();
 
-    private double? _average = null;
+    private decimal? _average = null;
     private int? _mostRecent = null;
 
     #region SnackBar
@@ -195,6 +195,19 @@
         await base.OnInitializedAsync();
     }
 
+    private string GetVotingValue(string? rawVote)
+    {
+        if (string.IsNullOrEmpty(rawVote))
+        {
+            return string.Empty;
+        }
+        else if (rawVote == VoteOption.VoteOptions.Last())
+        {
+            return "🤷‍♂️";
+        }
+        return rawVote;
+    }
+
     private async Task CreateStage()
     {
         var newStageName = await _matDialogService.PromptAsync("New stage name:");
@@ -214,7 +227,7 @@
         await _hubConnectionService.StartCountDown();
     }
 
-    private async Task Vote(int vote)
+    private async Task Vote(string vote)
     {
         try
         {
@@ -279,11 +292,12 @@
             if (results != null)
             {
                 this._voteResults = results.ToList();
-                var numericResults = _voteResults.Select(x => x.Vote);
-                this._average = numericResults!.Select(x => (double)x).Average();
+                var numericResults = _voteResults.Select(x => x.Vote)
+                    .Where(x =>x.All(Char.IsDigit)).Select(x => decimal.Parse(x));
+                this._average = numericResults!.Average();
                 var votesGrouping = numericResults!.GroupBy(x => x);
                 var maxVotes = votesGrouping.Max(x => x.Count());
-                this._mostRecent = votesGrouping.FirstOrDefault(x => x.Count() == maxVotes)?.Key;
+                this._mostRecent = (int)(votesGrouping.FirstOrDefault(x => x.Count() == maxVotes)?.Key ?? 0);
             }
             logger.LogInformation("Changed results");
             this.StateHasChanged();

@@ -3,4 +3,4 @@
 public record VotingResult(
     Guid UserId,
     Guid StageId,
-    int Vote);
+    string Vote);

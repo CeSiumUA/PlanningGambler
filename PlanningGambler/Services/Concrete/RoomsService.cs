@@ -123,7 +123,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
         room.CurrentStage = stage;
     }
 
-    public HiddenVotingResult Vote(Guid roomId, Guid userId, int vote)
+    public HiddenVotingResult Vote(Guid roomId, Guid userId, string vote)
     {
         if (!VoteOption.VoteOptions.Contains(vote))
         {

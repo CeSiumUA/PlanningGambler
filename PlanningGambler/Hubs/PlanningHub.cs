@@ -96,7 +96,7 @@ public class PlanningHub : Hub
         };
     }
 
-    public async Task Vote(int vote)
+    public async Task Vote(string vote)
     {
         if (this.Context.User == null)
         {

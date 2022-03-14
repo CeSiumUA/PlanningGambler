@@ -13,8 +13,15 @@ namespace PlanningGambler.Front.Services.Concrete
         }
         public async Task<string> GetQuoteOfTheDay()
         {
-            var response = await _httpClient.GetFromJsonAsync<QuoteResponseModel>("qod?language=en");
-            return response!.Contents.Quotes.First().Quote;
+            try
+            {
+                var response = await _httpClient.GetFromJsonAsync<QuoteResponseModel>("qod?language=en");
+                return response!.Contents.Quotes.First().Quote;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }
