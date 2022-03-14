@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PlanningGambler.Dtos;
-using PlanningGambler.Dtos.Requests;
 using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Services.Abstract;
+using PlanningGambler.Shared.Dtos;
+using PlanningGambler.Shared.Dtos.Requests;
 
 namespace PlanningGambler.Controllers;
 

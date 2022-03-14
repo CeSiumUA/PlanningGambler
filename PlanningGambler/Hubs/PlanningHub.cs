@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using PlanningGambler.Dtos;
-using PlanningGambler.Dtos.Requests;
 using PlanningGambler.Dtos.Results;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
+using PlanningGambler.Shared.Dtos;
+using PlanningGambler.Shared.Dtos.Requests;
 using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
 using PlanningGambler.Shared.Models.Rooms;

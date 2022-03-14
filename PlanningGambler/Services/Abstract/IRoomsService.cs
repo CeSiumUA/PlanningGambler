@@ -1,4 +1,5 @@
 ﻿using PlanningGambler.Dtos;
+using PlanningGambler.Shared.Dtos;
 
 namespace PlanningGambler.Services.Abstract;
 

@@ -3,8 +3,6 @@ using PlanningGambler.Models;
 using PlanningGambler.Models.Rooms;
 using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
-using HiddenVotingResult = PlanningGambler.Dtos.Results.HiddenVotingResult;
-using VotingResult = PlanningGambler.Dtos.Results.VotingResult;
 
 namespace PlanningGambler.Services.Abstract;
 

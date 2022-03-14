@@ -6,11 +6,10 @@ using PlanningGambler.Models;
 using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Models.Rooms;
 using PlanningGambler.Services.Abstract;
+using PlanningGambler.Shared.Dtos;
 using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
 using PlanningGambler.Shared.Models.Rooms;
-using HiddenVotingResult = PlanningGambler.Dtos.Results.HiddenVotingResult;
-using VotingResult = PlanningGambler.Dtos.Results.VotingResult;
 
 namespace PlanningGambler.Services.Concrete;
 
@@ -172,7 +171,10 @@ public class RoomsService : IRoomsService, IRoomManagerService
             throw new RoomNotFoundException(roomId);
         }
 
-        return new RoomInfo(room.Id, room.Participants.ToArray(), room.CurrentStage, room.Stages.ToArray());
+        return new RoomInfo(room.Id, room.Participants.ToArray(), room.Stages)
+        {
+            CurrentStage = room.CurrentStage
+        };
     }
 
     private async Task<byte[]> CreateHash(string password)
