@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using PlanningGambler.App.Data;
 
 namespace PlanningGambler.App
 {
@@ -17,7 +16,6 @@ namespace PlanningGambler.App
                 });
 
             builder.Services.AddBlazorWebView();
-            builder.Services.AddSingleton<WeatherForecastService>();
 
             return builder.Build();
         }
