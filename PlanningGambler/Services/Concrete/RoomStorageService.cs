@@ -32,6 +32,6 @@ public class RoomStorageService : IRoomStorage
     public Guid GetRoomByUser(string userId)
     {
         return _rooms
-            .FirstOrDefault(x => x.Participants.Any(y => y.Id == userId && y.ClientType == ClientType.Telegram)).Id;
+            .FirstOrDefault(x => x.Participants.Any(y => y.Id == userId && y.ClientType == ClientType.Telegram))?.Id ?? Guid.Empty;
     }
 }
