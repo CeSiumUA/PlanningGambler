@@ -7,4 +7,5 @@ public interface IRoomStorage
     public void AddRoom(Room room);
     public Room? GetRoom(Guid id);
     public void RemoveRoom(Guid id);
+    public Guid GetRoomByUser(string userId);
 }

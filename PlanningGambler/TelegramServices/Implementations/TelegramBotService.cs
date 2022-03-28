@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using MatBlazor;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using PlanningGambler.Hubs;
@@ -11,6 +12,7 @@ using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace PlanningGambler.TelegramServices.Implementations;
 
@@ -58,12 +60,30 @@ public class TelegramBotService
             try
             {
                 await NotifyUserJoined(user);
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, GetJoinGuide(), cancellationToken: cancellationToken);
             }
             catch (RoomNotFoundException e)
             {
                 await botClient.SendTextMessageAsync(update.Message.Chat.Id, e.Message, cancellationToken: cancellationToken);
                 return;
             }
+        }
+        else if (messageText.StartsWith("/vote"))
+        {
+            ReplyKeyboardMarkup replyKeyboardMarkup = new(new []
+            {
+                VoteOptions.Select(x => (KeyboardButton)x).ToArray(),
+            })
+            {
+                ResizeKeyboard = true
+            };
+            await botClient.SendTextMessageAsync(update.Message.Chat.Id, GetVotingOptions(), replyMarkup: replyKeyboardMarkup, cancellationToken: cancellationToken);
+        }
+        else if(VoteOptions.Contains(messageText))
+        {
+            var index = VoteOptions.IndexOf(messageText);
+            var normalOption = VoteOption.VoteOptions[index];
+            await VoteAsync(update.Message.Chat.Id.ToString(), normalOption);
         }
     }
 
@@ -90,10 +110,22 @@ public class TelegramBotService
         _logger.LogInformation("New participants count: {0}", newParticipantsList.Count);
         var participantsChanged =
                 new ParticipantsChangedDto(participantDto, newParticipantsList);
-        await NotifyClientsAsync(user.RoomId.ToString(), "ParticipantConnected", participantsChanged);
+        await NotifyHubClientsAsync(user.RoomId.ToString(), "ParticipantConnected", participantsChanged);
+    }
+
+    private async Task VoteAsync(string userId, string vote)
+    {
+        using (var scope = _serviceScopeFactory.CreateScope())
+        {
+            var roomManagerService = scope.ServiceProvider.GetService<IRoomManagerService>()!;
+            var hub = scope.ServiceProvider.GetService<IHubContext<PlanningHub>>()!;
+            var roomId = roomManagerService.GetRoomId(userId);
+            var voteResult = roomManagerService.Vote(roomId, userId, vote);
+            await hub.Clients.Group(roomId.ToString()).SendAsync("ParticipantVoted", voteResult);
+        }
     }
     
-    private async Task NotifyClientsAsync(string roomId, string methodName, object parameter)
+    private async Task NotifyHubClientsAsync(string roomId, string methodName, object parameter)
     {
         try
         {
@@ -111,6 +143,15 @@ public class TelegramBotService
         }
     }
 
+    public async Task NotifyTelegramClientsStageChangedAsync(IEnumerable<string> chatIds, string stageName)
+    {
+        foreach (var chatId in chatIds)
+        {
+            await _telegramBotClient!.SendTextMessageAsync(long.Parse(chatId), stageName);
+        }
+        
+    }
+
     private string GetGreetings()
     {
         return $"Welcome to Planning Gambler Bot!{Environment.NewLine}" +
@@ -118,4 +159,19 @@ public class TelegramBotService
                $"/join <room id or invite url> - join room{Environment.NewLine}" +
                $"";
     }
+
+    private string GetJoinGuide()
+    {
+        return $"Welcome to voting room!" +
+               $"{Environment.NewLine}" +
+               $"To vote, type: /vote";
+    }
+
+    private string GetVotingOptions()
+    {
+        return $"Please, select your vote:";
+    }
+
+    private readonly string[] VoteOptions = new string[]
+        {"1️⃣", "2️⃣", "3️⃣", "5️⃣", "8️⃣", "1️⃣3️⃣", "2️⃣1️⃣", "3️⃣4️⃣", "5️⃣5️⃣", "8️⃣9️⃣", "🤷‍♂️"};
 }

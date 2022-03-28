@@ -1,6 +1,7 @@
 ﻿using PlanningGambler.Models.Rooms;
 using PlanningGambler.Services.Abstract;
 using System.Linq;
+using PlanningGambler.Shared.Models;
 
 namespace PlanningGambler.Services.Concrete;
 
@@ -26,5 +27,11 @@ public class RoomStorageService : IRoomStorage
             return;
         }
         _rooms.Remove(existingRoom);
+    }
+
+    public Guid GetRoomByUser(string userId)
+    {
+        return _rooms
+            .FirstOrDefault(x => x.Participants.Any(y => y.Id == userId && y.ClientType == ClientType.Telegram)).Id;
     }
 }

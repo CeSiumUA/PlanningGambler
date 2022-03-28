@@ -11,6 +11,7 @@ using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
 using PlanningGambler.Shared.Models.Rooms;
 using PlanningGambler.TelegramServices.Implementations;
+using Telegram.Bot;
 
 namespace PlanningGambler.Hubs;
 
@@ -18,10 +19,11 @@ namespace PlanningGambler.Hubs;
 public class PlanningHub : Hub
 {
     private readonly IRoomManagerService _roomManagerService;
-
-    public PlanningHub(IRoomManagerService roomManagerService)
+    private readonly TelegramBotService _telegramBotService;
+    public PlanningHub(IRoomManagerService roomManagerService, TelegramBotService telegramBotService)
     {
         this._roomManagerService = roomManagerService;
+        this._telegramBotService = telegramBotService;
     }
     #region Administrator Methods
     [Authorize(Roles = "Administrator")]
@@ -53,6 +55,12 @@ public class PlanningHub : Hub
         var roomId = this.RetrieveRoomId();
         this._roomManagerService.SelectActiveStage(roomId, stageId);
         await this.Clients.Group(roomId.ToString()).SendAsync("StageSelected", stageId);
+        var stageName = _roomManagerService.GetStageName(roomId, stageId);
+
+        var tlParticipants = _roomManagerService.GetRoomParticipants(roomId)
+            .Where(x => x.ClientType == ClientType.Telegram);
+
+        await _telegramBotService.NotifyTelegramClientsStageChangedAsync(tlParticipants.Select(x => x.Id), stageName);
     }
 
     [Authorize(Roles = "Administrator")]

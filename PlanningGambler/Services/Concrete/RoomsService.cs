@@ -122,6 +122,23 @@ public class RoomsService : IRoomsService, IRoomManagerService
         room.CurrentStage = stage;
     }
 
+    public string GetStageName(Guid roomId, Guid stageId)
+    {
+        var room = _roomStorage.GetRoom(roomId);
+        if (room == null)
+        {
+            throw new RoomNotFoundException(roomId);
+        }
+        
+        var stage = room.Stages.FirstOrDefault(x => x.Id == stageId);
+        if (stage == null)
+        {
+            throw new StageNotFoundException(stageId);
+        }
+
+        return stage.Title;
+    }
+
     public HiddenVotingResult Vote(Guid roomId, string userId, string vote)
     {
         if (!VoteOption.VoteOptions.Contains(vote))
@@ -202,5 +219,10 @@ public class RoomsService : IRoomsService, IRoomManagerService
     public void RemoveRoom(Guid roomId)
     {
         _roomStorage.RemoveRoom(roomId);
+    }
+
+    public Guid GetRoomId(string userId)
+    {
+        return _roomStorage.GetRoomByUser(userId);
     }
 }
