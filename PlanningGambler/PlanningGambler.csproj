@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>ef45cf5c-3df1-4d5f-a2b8-16242c023c87</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,6 +22,7 @@
     <ItemGroup>
       <ProjectReference Include="..\PlanningGambler.Front\PlanningGambler.Front.csproj" />
       <ProjectReference Include="..\PlanningGambler.Shared\PlanningGambler.Shared.csproj" />
+      <ProjectReference Include="..\PlanningGambler.Telegram\PlanningGambler.Telegram.csproj" />
     </ItemGroup>
 
 </Project>

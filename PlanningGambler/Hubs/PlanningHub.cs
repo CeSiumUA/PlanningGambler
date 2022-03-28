@@ -10,6 +10,7 @@ using PlanningGambler.Shared.Dtos.Requests;
 using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
 using PlanningGambler.Shared.Models.Rooms;
+using PlanningGambler.TelegramServices.Implementations;
 
 namespace PlanningGambler.Hubs;
 
@@ -120,8 +121,12 @@ public class PlanningHub : Hub
             var memberType = this.RetrieveMemberType();
             var id = this.RetrieveId();
             var displayName = this.RetrieveDisplayName();
+            if (string.IsNullOrEmpty(id))
+            {
+                return;
+            }
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
-            var participant = new PlanningParticipant(id, displayName ?? string.Empty, memberType, roomId);
+            var participant = new PlanningParticipant(id, displayName ?? string.Empty, memberType, roomId, ClientType.Web);
             await this._roomManagerService.AddParticipantToRoom(participant);
             var newParticipantsList = this._roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
             var participantsChanged =
@@ -142,6 +147,7 @@ public class PlanningHub : Hub
             var memberType = this.RetrieveMemberType();
             var id = this.RetrieveId();
             var displayName = this.RetrieveDisplayName();
+            if(id == null) return;
             await this._roomManagerService.RemoveParticipantFromRoom(roomId, id);
             var participantDto = new ParticipantDto(id, displayName ?? string.Empty, memberType);
             var newParticipantsList = this._roomManagerService.GetRoom(roomId).Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType));
@@ -173,15 +179,10 @@ public class PlanningHub : Hub
         return this.Context.User?.Claims.First(x => x.Type == ClaimTypes.Name).Value;
     }
 
-    private Guid RetrieveId()
+    private string? RetrieveId()
     {
         var id = this.Context.User?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        if (string.IsNullOrEmpty(id))
-        {
-            return Guid.Empty;
-        }
-
-        return Guid.Parse(id);
+        return id;
     }
 
     private MemberType RetrieveMemberType()

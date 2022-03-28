@@ -9,4 +9,4 @@ public record RoomToken(
 [property: JsonPropertyName("expireAt")] DateTimeOffset ExpireAt,
 [property: JsonPropertyName("memberType")] MemberType MemberType,
 [property: JsonPropertyName("roomId")] Guid RoomId,
-[property: JsonPropertyName("userId")] Guid UserId);
+[property: JsonPropertyName("userId")] string UserId);

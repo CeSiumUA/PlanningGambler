@@ -1,8 +1,9 @@
 ﻿namespace PlanningGambler.Shared.Models;
 
 public record PlanningParticipant(
-Guid Id,
+string Id,
 string DisplayName,
 MemberType MemberType,
-Guid RoomId
+Guid RoomId,
+ClientType ClientType
 );

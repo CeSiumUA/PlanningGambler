@@ -9,10 +9,10 @@ namespace PlanningGambler.Services.Abstract;
 public interface IRoomManagerService
 {
     public Task AddParticipantToRoom(PlanningParticipant planningParticipant);
-    public Task RemoveParticipantFromRoom(Guid roomId, Guid planningParticipantId);
+    public Task RemoveParticipantFromRoom(Guid roomId, string planningParticipantId);
     public NewStageResult? CreateVotingStage(Guid roomId, string title, DateTimeOffset? deadline = null);
     public void SelectActiveStage(Guid roomId, Guid stageId);
-    public HiddenVotingResult Vote(Guid roomId, Guid userId, string vote);
+    public HiddenVotingResult Vote(Guid roomId, string userId, string vote);
     public IEnumerable<VotingResult> GetStageVotes(Guid roomId);
     public RoomInfo GetRoom(Guid roomId);
     public IEnumerable<PlanningParticipant> GetRoomParticipants(Guid roomId);

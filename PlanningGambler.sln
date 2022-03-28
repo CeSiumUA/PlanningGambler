@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningGambler.Front", "Pl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningGambler.Shared", "PlanningGambler.Shared\PlanningGambler.Shared.csproj", "{03432199-7419-4904-B365-14504A743BCA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanningGambler.Telegram", "PlanningGambler.Telegram\PlanningGambler.Telegram.csproj", "{7C09D088-B5C5-4831-94A8-3034CE550052}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{03432199-7419-4904-B365-14504A743BCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03432199-7419-4904-B365-14504A743BCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03432199-7419-4904-B365-14504A743BCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C09D088-B5C5-4831-94A8-3034CE550052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C09D088-B5C5-4831-94A8-3034CE550052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C09D088-B5C5-4831-94A8-3034CE550052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C09D088-B5C5-4831-94A8-3034CE550052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

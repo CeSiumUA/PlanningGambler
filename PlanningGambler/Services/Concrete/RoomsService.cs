@@ -31,7 +31,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
             room.PasswordHash = await CreateHash(roomPassword);
         }
 
-        var planningParticipant = new PlanningParticipant(Guid.NewGuid(), displayName, MemberType.Administrator, room.Id);
+        var planningParticipant = new PlanningParticipant(Guid.NewGuid().ToString(), displayName, MemberType.Administrator, room.Id, ClientType.Web);
 
         _roomStorage.AddRoom(room);
 
@@ -66,7 +66,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
             throw new NameAlreadyTakenException(displayName);
         }
         
-        var planningParticipant = new PlanningParticipant(Guid.NewGuid(), displayName, MemberType.Participant, room.Id);
+        var planningParticipant = new PlanningParticipant(Guid.NewGuid().ToString(), displayName, MemberType.Participant, room.Id, ClientType.Web);
 
         var token = _tokenService.CreateToken(planningParticipant);
 
@@ -83,7 +83,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
         room.Participants.Add(planningParticipant);
     }
 
-    public async Task RemoveParticipantFromRoom(Guid roomId, Guid planningParticipantId)
+    public async Task RemoveParticipantFromRoom(Guid roomId, string planningParticipantId)
     {
         var room = _roomStorage.GetRoom(roomId);
         if (room != null)
@@ -122,7 +122,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
         room.CurrentStage = stage;
     }
 
-    public HiddenVotingResult Vote(Guid roomId, Guid userId, string vote)
+    public HiddenVotingResult Vote(Guid roomId, string userId, string vote)
     {
         if (!VoteOption.VoteOptions.Contains(vote))
         {

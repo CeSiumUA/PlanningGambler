@@ -2,5 +2,5 @@
 
 public record HiddenVotingResult(
     Guid StageId,
-    Guid UserId
+    string UserId
 );

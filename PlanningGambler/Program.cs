@@ -4,8 +4,11 @@ using PlanningGambler.Hubs;
 using PlanningGambler.Models;
 using PlanningGambler.Services.Abstract;
 using PlanningGambler.Services.Concrete;
+using PlanningGambler.TelegramServices.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.ConfigureAppConfiguration(config => config.AddEnvironmentVariables());
 
 builder.Services.AddAuthentication(auth =>
     {
@@ -58,10 +61,16 @@ builder.Services.AddScoped<IRoomsService, RoomsService>();
 builder.Services.AddScoped<IRoomManagerService, RoomsService>();
 builder.Services.AddSingleton<IRoomStorage, RoomStorageService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<TelegramBotService>();
+
+var telegramBotKey = builder.Configuration.GetConnectionString("TelegramBotKey");
 
 builder.Services.AddSwaggerDocument();
 
 var app = builder.Build();
+
+var botService = app.Services.GetRequiredService<TelegramBotService>();
+botService.StartListener(telegramBotKey);
 
 app.UseCors(policyBuilder =>
 {
