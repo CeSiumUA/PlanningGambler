@@ -17,9 +17,9 @@ namespace PlanningGambler.Front.Services.Concrete
             this._httpClient = httpClient;
         }
 
-        public async Task<RoomToken?> CreateRoom(string displayName, string? password)
+        public async Task<RoomToken?> CreateRoom(string displayName, string? password, bool useJira, string? jiraBaseAddress)
         {
-            var createRoomRequest = new BaseRoomRequest(displayName, password);
+            var createRoomRequest = new BaseRoomRequest(displayName, password, useJira, jiraBaseAddress);
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/rooms/create");
             await using var memoryStream = new MemoryStream();
             await JsonSerializer.SerializeAsync(memoryStream, createRoomRequest);

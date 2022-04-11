@@ -89,7 +89,8 @@ public class PlanningHub : Hub
         //return new RoomInfo(room.RoomId, room.Participants, currentStage, room.Stages.Select(x => new PlanningStage(x.Id, x.Title, new(), )))
         return new RoomDto(room.RoomId,
             room.Participants,
-            room.Stages.Select(x => new NewStageResult(x.Id, x.Title, x.Deadline)).ToList())
+            room.Stages.Select(x => new NewStageResult(x.Id, x.Title, x.Deadline)).ToList(),
+            room.JiraUrl)
         {
             CurrentStage = room.CurrentStage == null
                 ? null

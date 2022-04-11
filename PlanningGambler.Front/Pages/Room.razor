@@ -75,19 +75,41 @@
         }
     </div>
     <div style="width: 10%; position: fixed; right: 0">
-        <MatList>
+        <MatList style="width: 100%">
             @foreach (var stage in _roomInfo!.Stages)
             {
                 <MatListItem OnClick="() => SelectCurrentStage(stage.Id)">
                     <MatListItemText>
                         @if (_roomInfo.CurrentStage != null && stage.Id == _roomInfo!.CurrentStage!.Id)
                         {
-                            <MatListItemPrimaryText style="color: green">@stage.Title</MatListItemPrimaryText>
+                            @if (!string.IsNullOrEmpty(_roomInfo.JiraAddress))
+                            {
+                                <MatListItemPrimaryText style="color: green">@stage.Title
+                                    <MatIconButton Link="@GetTicketLink(stage)" Target="_blank">
+                                        <MatIcon>@MatIconNames.Link</MatIcon>
+                                    </MatIconButton>
+                                </MatListItemPrimaryText>
+                            }
+                            else
+                            {
+                                <MatListItemPrimaryText style="color: green">@stage.Title</MatListItemPrimaryText>
+                            }
                             <MatListItemSecondaryText style="color: green">Current stage</MatListItemSecondaryText>
                         }
                         else
                         {
-                            <MatListItemPrimaryText>@stage.Title</MatListItemPrimaryText>
+                            @if (!string.IsNullOrEmpty(_roomInfo.JiraAddress))
+                            {
+                                <MatListItemPrimaryText>@stage.Title
+                                    <MatIconButton Link="@GetTicketLink(stage)" Target="_blank">
+                                        <MatIcon>@MatIconNames.Link</MatIcon>
+                                    </MatIconButton>
+                                </MatListItemPrimaryText>
+                            }
+                            else
+                            {
+                                <MatListItemPrimaryText>@stage.Title</MatListItemPrimaryText>
+                            }
                         }
                     </MatListItemText>
                 </MatListItem>
@@ -331,5 +353,11 @@
     {
         this._snackBarOpen = false;
         this.StateHasChanged();
+    }
+
+    private string GetTicketLink(NewStageResult stage)
+    {
+        var uri = new Uri($"{_roomInfo.JiraAddress}/browse/{stage.Title}");
+        return uri.ToString();
     }
 }
