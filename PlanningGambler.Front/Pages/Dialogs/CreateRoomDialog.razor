@@ -12,6 +12,13 @@
 <MatDialogContent>
     <MatTextField FullWidth="true" @bind-Value="@_roomDisplayName" Label="Display Name"></MatTextField>
     <MatTextField FullWidth="true" @bind-Value="@_roomPassword" Label="Room Password"></MatTextField>
+    <div>
+        <MatCheckbox @bind-Value="_useJiraLinks" Label="Use JIRA"></MatCheckbox>
+        @if (_useJiraLinks)
+        {
+            <MatTextField FullWidth="true" @bind-Value="@_jiraAddress" Label="JIRA example links"></MatTextField>
+        }
+    </div>
 </MatDialogContent>
 <MatDialogActions>
     <MatButton OnClick="@(_ => CloseDialog())">Close</MatButton>
@@ -21,6 +28,8 @@
 @code {
     private string _roomPassword = string.Empty;
     private string _roomDisplayName = string.Empty;
+    private bool _useJiraLinks;
+    private string? _jiraAddress;
 
     [CascadingParameter]
     public MatDialogReference? DialogReference { get; set; }
@@ -32,7 +41,7 @@
 
     private async Task CreateRoom()
     {
-        var token = await _roomConnectionProvider.CreateRoom(_roomDisplayName, string.IsNullOrEmpty(_roomPassword) ? null : _roomPassword);
+        var token = await _roomConnectionProvider.CreateRoom(_roomDisplayName, string.IsNullOrEmpty(_roomPassword) ? null : _roomPassword, _useJiraLinks, _jiraAddress);
         await _localStorageService.SetItemAsync("auth_token", token);
         DialogReference?.Close("Closed");
         _navigationManager.NavigateTo("/room");

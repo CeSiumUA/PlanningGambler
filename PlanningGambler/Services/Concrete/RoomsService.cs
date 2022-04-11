@@ -22,13 +22,19 @@ public class RoomsService : IRoomsService, IRoomManagerService
         _roomStorage = roomStorage;
         _tokenService = tokenService;
     }
-    public async Task<RoomToken> CreateRoom(string displayName, string? roomPassword)
+    public async Task<RoomToken> CreateRoom(string displayName, string? roomPassword, bool useJira, string? jiraAddress)
     {
         var room = new Room();
         if (roomPassword != null)
         {
             room.UsePassword = true;
             room.PasswordHash = await CreateHash(roomPassword);
+        }
+
+        if (useJira && !string.IsNullOrEmpty(jiraAddress))
+        {
+            var uri = new Uri(jiraAddress);
+            room.JiraAddress = uri.GetLeftPart(UriPartial.Authority);
         }
 
         var planningParticipant = new PlanningParticipant(Guid.NewGuid(), displayName, MemberType.Administrator, room.Id);
@@ -171,7 +177,7 @@ public class RoomsService : IRoomsService, IRoomManagerService
             throw new RoomNotFoundException(roomId);
         }
 
-        return new RoomInfo(room.Id, room.Participants.ToArray(), room.Stages)
+        return new RoomInfo(room.Id, room.Participants.ToArray(), room.Stages, room.JiraAddress)
         {
             CurrentStage = room.CurrentStage
         };

@@ -6,7 +6,8 @@ namespace PlanningGambler.Dtos.Results;
 public record RoomInfo(
     Guid RoomId,
     PlanningParticipant[] Participants,
-    List<PlanningStage> Stages
+    List<PlanningStage> Stages,
+    string? JiraUrl
 )
 {
     public PlanningStage? CurrentStage { get; set; }

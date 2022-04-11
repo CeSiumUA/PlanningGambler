@@ -28,7 +28,7 @@ public class RoomsController : ControllerBase
     {
         try
         {
-            var tokenResult = await _roomsService.CreateRoom(request.DisplayName, request.RoomPassword);
+            var tokenResult = await _roomsService.CreateRoom(request.DisplayName, request.RoomPassword, request.UseJira, request.JiraBaseAddress);
             return new JsonResult(tokenResult);
         }
         catch

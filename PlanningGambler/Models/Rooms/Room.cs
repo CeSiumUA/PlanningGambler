@@ -10,6 +10,7 @@ public class Room
     public byte[] PasswordHash { get; set; } = new byte[]{};
     public List<PlanningParticipant> Participants { get; } = new();
     public PlanningStage? CurrentStage { get; set; }
+    public string? JiraAddress { get; set; }
 
     public int? CurrentStageNumber
     {

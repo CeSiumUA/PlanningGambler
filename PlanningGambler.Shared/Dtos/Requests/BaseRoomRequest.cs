@@ -10,9 +10,19 @@ public record BaseRoomRequest
 
     public string? RoomPassword { get; init; }
 
-    public BaseRoomRequest(string displayName, string? roomPassword)
+    public bool UseJira { get; init; }
+    
+    public string? JiraBaseAddress { get; init; }
+    
+    public BaseRoomRequest(string displayName, string? password, bool? useJira, string? jiraBaseAddress)
     {
-        this.DisplayName = displayName;
-        this.RoomPassword = roomPassword;
+        DisplayName = displayName;
+        RoomPassword = password;
+        if (useJira.HasValue && useJira.Value)
+        {
+            UseJira = useJira.Value;
+            JiraBaseAddress = jiraBaseAddress;
+        }
     }
+    public BaseRoomRequest(){}
 }
