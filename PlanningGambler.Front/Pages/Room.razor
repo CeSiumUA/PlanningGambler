@@ -79,7 +79,7 @@
         <MatList style="width: 100%">
             @foreach (var stage in _roomInfo!.Stages)
             {
-                <MatListItem OnClick="() => SelectCurrentStage(stage.Id)">
+                <MatListItem>
                     <MatListItemText>
                         @if (_roomInfo.CurrentStage != null && stage.Id == _roomInfo!.CurrentStage!.Id)
                         {
@@ -102,6 +102,9 @@
                             @if (!string.IsNullOrEmpty(_roomInfo.JiraAddress))
                             {
                                 <MatListItemPrimaryText>@stage.Title
+                                    <MatIconButton OnClick="() => SelectCurrentStage(stage.Id)">
+                                        <MatIcon>@MatIconNames.Check</MatIcon>
+                                    </MatIconButton>
                                     <MatIconButton Link="@GetTicketLink(stage)" Target="_blank">
                                         <MatIcon>@MatIconNames.Link</MatIcon>
                                     </MatIconButton>
@@ -109,7 +112,11 @@
                             }
                             else
                             {
-                                <MatListItemPrimaryText>@stage.Title</MatListItemPrimaryText>
+                                <MatListItemPrimaryText>@stage.Title
+                                    <MatIconButton OnClick="() => SelectCurrentStage(stage.Id)">
+                                        <MatIcon>@MatIconNames.Check</MatIcon>
+                                    </MatIconButton>
+                                </MatListItemPrimaryText>
                             }
                         }
                     </MatListItemText>
