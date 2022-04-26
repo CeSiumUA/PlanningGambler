@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using PlanningGambler.Dtos;
 using PlanningGambler.Models;
 using PlanningGambler.Shared.Dtos;
 using PlanningGambler.Shared.Models;
@@ -34,6 +33,6 @@ public class TokenService
             expireAt,
             planningParticipant.MemberType,
             planningParticipant.RoomId,
-            planningParticipant.Id); 
+            planningParticipant.Id);
     }
 }

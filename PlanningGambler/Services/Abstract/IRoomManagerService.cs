@@ -1,6 +1,4 @@
 ﻿using PlanningGambler.Dtos.Results;
-using PlanningGambler.Models;
-using PlanningGambler.Models.Rooms;
 using PlanningGambler.Shared.Dtos.Results;
 using PlanningGambler.Shared.Models;
 

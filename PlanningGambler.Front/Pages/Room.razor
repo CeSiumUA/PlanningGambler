@@ -7,16 +7,13 @@
 @inject ILogger<Room> logger
 @inject IQuoteProvider _quoteProvider
 @page "/room"
-@using Microsoft.AspNetCore.WebUtilities
 @using PlanningGambler.Front.Services.Abstract
-@using Blazored.LocalStorage
-@using PlanningGambler.Dtos.Results
 @using PlanningGambler.Front.Services.Concrete
 @using PlanningGambler.Shared.Dtos
 @using PlanningGambler.Shared.Dtos.Results
 @using PlanningGambler.Shared.Models
-@using PlanningGambler.Shared.Models.Rooms
-@using System.Runtime.CompilerServices
+@using Blazored.LocalStorage
+@using Microsoft.AspNetCore.WebUtilities
 @using PlanningGambler.Front.Pages.Dialogs
 
 <PageTitle>Planning Room</PageTitle>
@@ -56,7 +53,7 @@
 @if (_roomInfo != null)
 {
     <div style="width: 90%; position: absolute; left: 0">
-        @foreach (var participant in this._participants)
+        @foreach (var participant in _participants)
         {
             <MatCard style="width: 200px; margin-top: 20px; margin-bottom: 20px; margin-left: 20px; margin-right: 20px; display: inline-block">
                 <MatCardContent style="padding: 1rem;">
@@ -67,7 +64,8 @@
                         }
                         else
                         {
-                            @GetVotingValue(_voteResults.FirstOrDefault(x => x.UserId == participant.Id)?.Vote);
+                            @GetVotingValue(_voteResults.FirstOrDefault(x => x.UserId == participant.Id)?.Vote)
+                            ;
                         }
                     </MatCardMedia>
                     <MatHeadline6>@participant.DisplayName</MatHeadline6>
@@ -85,7 +83,8 @@
                         {
                             @if (!string.IsNullOrEmpty(_roomInfo.JiraAddress))
                             {
-                                <MatListItemPrimaryText style="color: green">@stage.Title
+                                <MatListItemPrimaryText style="color: green">
+                                    @stage.Title
                                     <MatIconButton Link="@GetTicketLink(stage)" Target="_blank">
                                         <MatIcon>@MatIconNames.Link</MatIcon>
                                     </MatIconButton>
@@ -101,7 +100,8 @@
                         {
                             @if (!string.IsNullOrEmpty(_roomInfo.JiraAddress))
                             {
-                                <MatListItemPrimaryText>@stage.Title
+                                <MatListItemPrimaryText>
+                                    @stage.Title
                                     <MatIconButton OnClick="() => SelectCurrentStage(stage.Id)">
                                         <MatIcon>@MatIconNames.Check</MatIcon>
                                     </MatIconButton>
@@ -112,7 +112,8 @@
                             }
                             else
                             {
-                                <MatListItemPrimaryText>@stage.Title
+                                <MatListItemPrimaryText>
+                                    @stage.Title
                                     <MatIconButton OnClick="() => SelectCurrentStage(stage.Id)">
                                         <MatIcon>@MatIconNames.Check</MatIcon>
                                     </MatIconButton>
@@ -129,15 +130,17 @@
         }
         @if (_average.HasValue && _mostRecent.HasValue)
         {
-            <p>Average: @System.Math.Round(_average.Value, 2)</p>
+            <p>Average: @Math.Round(_average.Value, 2)</p>
             <p>Most votes: @_mostRecent</p>
         }
     </div>
 }
 
 @code {
+
     [Parameter]
     public string? RoomId { get; set; }
+
     [Parameter]
     public string? RoomPassword { get; set; }
 
@@ -146,24 +149,26 @@
     private RoomToken? _roomToken;
     private RoomDto? _roomInfo;
 
-    ForwardRef menuRef = new ForwardRef();
+    readonly ForwardRef menuRef = new();
 
-    private decimal? _average = null;
-    private int? _mostRecent = null;
+    private decimal? _average;
+    private int? _mostRecent;
 
     #region SnackBar
-    private bool _snackBarOpen = false;
+
+    private bool _snackBarOpen;
 
     private string? _snackBarMessage;
 
-    private const string SnackBarMessageFormat = "Client {0} has been {1}";
+        private const string SnackBarMessageFormat = "Client {0} has been {1}";
+
     #endregion
 
     private int? _currentCountDown;
 
     private List<ParticipantDto> _participants = new();
     private List<VotingResult> _voteResults = new();
-    private HashSet<Guid> _hiddenResults = new();
+    private readonly HashSet<Guid> _hiddenResults = new();
 
     private string? _quoteOfTeDay = string.Empty;
 
@@ -180,17 +185,17 @@
         {
             if (parsedQuery.TryGetValue("id", out var id))
             {
-                this.RoomId = id.First();
+                RoomId = id.First();
             }
 
             if (parsedQuery.TryGetValue("password", out var password))
             {
-                this.RoomPassword = password.First();
+                RoomPassword = password.First();
             }
 
-            if ((_roomToken == null || !(await _roomConnectionProvider.Verify(_roomToken.Token))) && RoomId != null)
+            if ((_roomToken == null || !await _roomConnectionProvider.Verify(_roomToken.Token)) && RoomId != null)
             {
-                var displayName = (await _matDialogService.OpenAsync(typeof(JoinRoomLinkDialog), new MatDialogOptions())) as string;
+                var displayName = await _matDialogService.OpenAsync(typeof(JoinRoomLinkDialog), new MatDialogOptions()) as string;
                 if (!string.IsNullOrEmpty(displayName))
                 {
                     _roomToken = await _roomConnectionProvider.JoinRoom(Guid.Parse(RoomId), displayName, RoomPassword);
@@ -209,19 +214,16 @@
             _navigationManager.NavigateTo("/");
             return;
         }
-        else
+        var verified = await _roomConnectionProvider.Verify(_roomToken.Token);
+        if (!verified)
         {
-            var verified = await _roomConnectionProvider.Verify(_roomToken.Token);
-            if (!verified)
-            {
-                _navigationManager.NavigateTo("/");
-                return;
-            }
+            _navigationManager.NavigateTo("/");
+            return;
         }
         await _hubConnectionService.StartConnection(_roomToken!.Token);
-        this.SubscribeToMessages();
-        this._roomInfo = await _hubConnectionService.FetchRoom();
-        this._participants = _roomInfo!.Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType)).ToList();
+        SubscribeToMessages();
+        _roomInfo = await _hubConnectionService.FetchRoom();
+        _participants = _roomInfo!.Participants.Select(x => new ParticipantDto(x.Id, x.DisplayName, x.MemberType)).ToList();
         await base.OnInitializedAsync();
     }
 
@@ -231,7 +233,7 @@
         {
             return string.Empty;
         }
-        else if (rawVote == VoteOption.VoteOptions.Last())
+        if (rawVote == VoteOption.VoteOptions.Last())
         {
             return "🤷‍♂️";
         }
@@ -269,76 +271,75 @@
             await _matDialogService.AlertAsync("Can not vote! Please, try selecting a stage to vote for, or try again later");
             logger.LogError("Vote error");
         }
-        
     }
 
     private void SubscribeToMessages()
     {
         logger.LogInformation("Subscribing...");
-        this._hubConnectionService.OnParticipantConnected += (sender, dto) =>
+        _hubConnectionService.OnParticipantConnected += (sender, dto) =>
         {
             logger.LogInformation("Client connected, participants: {0}", string.Join(", ", dto.Participants.Select(x => x.DisplayName)));
-            this._participants = dto.Participants.ToList();
-            this._snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "connected");
-            this._snackBarOpen = true;
+            _participants = dto.Participants.ToList();
+            _snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "connected");
+            _snackBarOpen = true;
             logger.LogInformation("Current participants: {0}", string.Join(", ", _participants.Select(x => x.DisplayName)));
-            this.StateHasChanged();
+            StateHasChanged();
         };
-        this._hubConnectionService.OnParticipantDisconnected += (sender, dto) =>
+        _hubConnectionService.OnParticipantDisconnected += (sender, dto) =>
         {
             logger.LogInformation("Client disconnected, participants: {0}", string.Join(", ", dto.Participants.Select(x => x.DisplayName)));
-            this._participants = dto.Participants.ToList();
-            this._snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "disconnected");
-            this._snackBarOpen = true;
+            _participants = dto.Participants.ToList();
+            _snackBarMessage = string.Format(SnackBarMessageFormat, dto.AffectedParticipant.DisplayName, "disconnected");
+            _snackBarOpen = true;
             logger.LogInformation("Current participants: {0}", string.Join(", ", _participants.Select(x => x.DisplayName)));
-            this.StateHasChanged();
+            StateHasChanged();
         };
-        this._hubConnectionService.OnStageCreated += (sender, result) =>
+        _hubConnectionService.OnStageCreated += (sender, result) =>
         {
             if (result != null)
             {
-                this._roomInfo!.Stages.Add(new NewStageResult(result.Id, result.Title, result.Deadline)); 
-                this.StateHasChanged();
+                _roomInfo!.Stages.Add(new NewStageResult(result.Id, result.Title, result.Deadline));
+                StateHasChanged();
             }
         };
-        this._hubConnectionService.OnStageSelected += (sender, guid) =>
+        _hubConnectionService.OnStageSelected += (sender, guid) =>
         {
-            this._roomInfo!.CurrentStage = this._roomInfo!.Stages.First(x => x.Id == guid);
-            this._voteResults = new List<VotingResult>();
-            this._average = null;
-            this._mostRecent = null;
-            this.StateHasChanged();
+            _roomInfo!.CurrentStage = _roomInfo!.Stages.First(x => x.Id == guid);
+            _voteResults = new List<VotingResult>();
+            _average = null;
+            _mostRecent = null;
+            StateHasChanged();
         };
-        this._hubConnectionService.OnCountDown += (sender, i) =>
+        _hubConnectionService.OnCountDown += (sender, i) =>
         {
-            this._currentCountDown = i;
-            this.StateHasChanged();
+            _currentCountDown = i;
+            StateHasChanged();
         };
-        this._hubConnectionService.OnStageVotingResult += (sender, results) =>
+        _hubConnectionService.OnStageVotingResult += (sender, results) =>
         {
-            this._currentCountDown = null;
-            this._hiddenResults.Clear();
+            _currentCountDown = null;
+            _hiddenResults.Clear();
             logger.LogInformation("Got vote results: {0}", string.Join(", ", results.Select(x => x.Vote)));
             if (results != null)
             {
-                this._voteResults = results.ToList();
+                _voteResults = results.ToList();
                 var numericResults = _voteResults.Select(x => x.Vote)
-                    .Where(x =>x.All(Char.IsDigit)).Select(x => decimal.Parse(x));
-                this._average = numericResults!.Average();
+                    .Where(x => x.All(char.IsDigit)).Select(x => decimal.Parse(x));
+                _average = numericResults!.Average();
                 var votesGrouping = numericResults!.GroupBy(x => x);
                 var maxVotes = votesGrouping.Max(x => x.Count());
-                this._mostRecent = (int)(votesGrouping.FirstOrDefault(x => x.Count() == maxVotes)?.Key ?? 0);
+                _mostRecent = (int) (votesGrouping.FirstOrDefault(x => x.Count() == maxVotes)?.Key ?? 0);
             }
             logger.LogInformation("Changed results");
-            this.StateHasChanged();
+            StateHasChanged();
         };
-        this._hubConnectionService.OnParticipantVoted += (sender, result) =>
+        _hubConnectionService.OnParticipantVoted += (sender, result) =>
         {
             if (result != null)
             {
-                this._hiddenResults.Add(result.UserId);
+                _hiddenResults.Add(result.UserId);
             }
-            this.StateHasChanged();
+            StateHasChanged();
         };
     }
 
@@ -359,8 +360,8 @@
 
     private void CloseSnackBar()
     {
-        this._snackBarOpen = false;
-        this.StateHasChanged();
+        _snackBarOpen = false;
+        StateHasChanged();
     }
 
     private string GetTicketLink(NewStageResult stage)
@@ -368,4 +369,5 @@
         var uri = new Uri($"{_roomInfo.JiraAddress}/browse/{stage.Title}");
         return uri.ToString();
     }
+
 }

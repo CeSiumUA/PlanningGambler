@@ -1,5 +1,4 @@
-﻿@using PlanningGambler.Front.Services.Abstract
-@using PlanningGambler.Front.Pages.Dialogs
+﻿@using PlanningGambler.Front.Pages.Dialogs
 @inherits LayoutComponentBase
 @inject IMatDialogService matDialogService
 
@@ -21,7 +20,7 @@
 
 @code
 {
-    ForwardRef buttonForwardRef = new ForwardRef();
+    readonly ForwardRef buttonForwardRef = new();
     MatMenu Menu;
 
     public async Task CreateRoom()

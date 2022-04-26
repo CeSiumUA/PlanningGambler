@@ -5,14 +5,14 @@
     <MatTextField FullWidth="true" @bind-Value="@_roomDisplayName" Id="name" Required="true" Label="Display Name"></MatTextField>
 </MatDialogContent>
 <MatDialogActions>
-    <MatButton OnClick="@(_ =>CloseDialog())">Join</MatButton>
+    <MatButton OnClick="@(_ => CloseDialog())">Join</MatButton>
 </MatDialogActions>
 
 @code {
 
     [CascadingParameter]
     public MatDialogReference? DialogReference { get; set; }
-    
+
     private string _roomDisplayName = string.Empty;
 
     private void CloseDialog()
@@ -22,4 +22,5 @@
             DialogReference?.Close(_roomDisplayName);
         }
     }
+
 }

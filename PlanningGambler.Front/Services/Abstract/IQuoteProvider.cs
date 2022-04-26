@@ -1,7 +1,6 @@
-﻿namespace PlanningGambler.Front.Services.Abstract
+﻿namespace PlanningGambler.Front.Services.Abstract;
+
+public interface IQuoteProvider
 {
-    public interface IQuoteProvider
-    {
-        public Task<string> GetQuoteOfTheDay();
-    }
+    public Task<string> GetQuoteOfTheDay();
 }

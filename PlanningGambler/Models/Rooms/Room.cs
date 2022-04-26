@@ -7,7 +7,7 @@ public class Room
 {
     public Guid Id { get; } = Guid.NewGuid();
     public bool UsePassword { get; set; } = false;
-    public byte[] PasswordHash { get; set; } = new byte[]{};
+    public byte[] PasswordHash { get; set; } = { };
     public List<PlanningParticipant> Participants { get; } = new();
     public PlanningStage? CurrentStage { get; set; }
     public string? JiraAddress { get; set; }
@@ -16,29 +16,21 @@ public class Room
     {
         get
         {
-            if (CurrentStage == null)
-            {
-                return null;
-            }
+            if (CurrentStage == null) return null;
 
             return Stages.IndexOf(CurrentStage);
         }
     }
+
     public List<PlanningStage> Stages { get; } = new();
 
     public void NextStage()
     {
-        if (this.Stages.Count == 0)
-        {
-            return;
-        }
+        if (Stages.Count == 0) return;
 
-        int nextIndex = (this.CurrentStageNumber ?? 0) + 1;
-        if (nextIndex >= this.Stages.Count)
-        {
-            return;
-        }
+        var nextIndex = (CurrentStageNumber ?? 0) + 1;
+        if (nextIndex >= Stages.Count) return;
 
-        this.CurrentStage = this.Stages[nextIndex];
+        CurrentStage = Stages[nextIndex];
     }
 }

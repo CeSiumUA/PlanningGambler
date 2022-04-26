@@ -1,6 +1,5 @@
 ﻿@using PlanningGambler.Front.Services.Abstract
 @using Blazored.LocalStorage
-@using System.Text.Json
 @inject NavigationManager _navigationManager
 @inject IMatDialogService _matDialogService
 @inject IRoomConnectionProvider _roomConnectionProvider
@@ -46,4 +45,5 @@
         DialogReference?.Close("Closed");
         _navigationManager.NavigateTo("/room");
     }
+
 }

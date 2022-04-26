@@ -1,12 +1,11 @@
 ﻿using PlanningGambler.Models.Rooms;
 using PlanningGambler.Services.Abstract;
-using System.Linq;
 
 namespace PlanningGambler.Services.Concrete;
 
 public class RoomStorageService : IRoomStorage
 {
-    private readonly List<Room> _rooms = new List<Room>();
+    private readonly List<Room> _rooms = new();
 
     public void AddRoom(Room room)
     {
@@ -21,10 +20,7 @@ public class RoomStorageService : IRoomStorage
     public void RemoveRoom(Guid id)
     {
         var existingRoom = _rooms.FirstOrDefault();
-        if (existingRoom == null)
-        {
-            return;
-        }
+        if (existingRoom == null) return;
         _rooms.Remove(existingRoom);
     }
 }
