@@ -38,6 +38,7 @@ namespace PlanningGambler.Front.Services.Concrete
                 {
                     options.AccessTokenProvider = async () => await this.RetrieveToken();
                 })
+                .WithAutomaticReconnect()
                 .Build();
         }
 
