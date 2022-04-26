@@ -17,6 +17,7 @@
 @using PlanningGambler.Shared.Models
 @using PlanningGambler.Shared.Models.Rooms
 @using System.Runtime.CompilerServices
+@using PlanningGambler.Front.Pages.Dialogs
 
 <PageTitle>Planning Room</PageTitle>
 <MatFAB style="position: fixed; left: 50px; bottom: 50px; z-index: 2;" RefBack="menuRef" OnClick="OpenVoteMenu" Icon="@MatIconNames.Poll"></MatFAB>
@@ -182,7 +183,7 @@
 
             if ((_roomToken == null || !(await _roomConnectionProvider.Verify(_roomToken.Token))) && RoomId != null)
             {
-                var displayName = await _matDialogService.PromptAsync("Please, enter name");
+                var displayName = (await _matDialogService.OpenAsync(typeof(JoinRoomLinkDialog), new MatDialogOptions())) as string;
                 if (!string.IsNullOrEmpty(displayName))
                 {
                     _roomToken = await _roomConnectionProvider.JoinRoom(Guid.Parse(RoomId), displayName, RoomPassword);

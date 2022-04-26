@@ -10,8 +10,8 @@
     Create room
 </MatDialogTitle>
 <MatDialogContent>
-    <MatTextField FullWidth="true" @bind-Value="@_roomDisplayName" Label="Display Name"></MatTextField>
-    <MatTextField FullWidth="true" @bind-Value="@_roomPassword" Label="Room Password"></MatTextField>
+    <MatTextField FullWidth="true" @bind-Value="@_roomDisplayName" Id="name" Label="Display Name"></MatTextField>
+    <MatTextField FullWidth="true" @bind-Value="@_roomPassword" Id="password" Label="Room Password"></MatTextField>
     <div>
         <MatCheckbox @bind-Value="_useJiraLinks" Label="Use JIRA"></MatCheckbox>
         @if (_useJiraLinks)
