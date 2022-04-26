@@ -319,14 +319,14 @@
         {
             _currentCountDown = null;
             _hiddenResults.Clear();
-            logger.LogInformation("Got vote results: {0}", string.Join(", ", results.Select(x => x.Vote)));
             if (results != null)
             {
+                logger.LogInformation("Got vote results: {Results}", string.Join(", ", results.Select(x => x.Vote)));
                 _voteResults = results.ToList();
                 var numericResults = _voteResults.Select(x => x.Vote)
-                    .Where(x => x.All(char.IsDigit)).Select(x => decimal.Parse(x));
+                    .Where(x => x.All(char.IsDigit)).Select(x => decimal.Parse(x)).ToList();
                 _average = numericResults!.Average();
-                var votesGrouping = numericResults!.GroupBy(x => x);
+                var votesGrouping = numericResults!.GroupBy(x => x).ToList();
                 var maxVotes = votesGrouping.Max(x => x.Count());
                 _mostRecent = (int) (votesGrouping.FirstOrDefault(x => x.Count() == maxVotes)?.Key ?? 0);
             }
@@ -345,7 +345,10 @@
 
     private async Task OpenVoteMenu()
     {
-        await VoteMenu?.OpenAsync();
+        if (VoteMenu != null)
+        {
+            await VoteMenu.OpenAsync();
+        }
     }
 
     private async Task OpenShareDialog()
@@ -355,7 +358,10 @@
 
     private async Task CloseVoteMenu()
     {
-        await VoteMenu?.CloseAsync();
+        if (VoteMenu != null)
+        {
+            await VoteMenu.CloseAsync();
+        }
     }
 
     private void CloseSnackBar()
@@ -366,7 +372,7 @@
 
     private string GetTicketLink(NewStageResult stage)
     {
-        var uri = new Uri($"{_roomInfo.JiraAddress}/browse/{stage.Title}");
+        var uri = new Uri($"{_roomInfo!.JiraAddress}/browse/{stage.Title}");
         return uri.ToString();
     }
 

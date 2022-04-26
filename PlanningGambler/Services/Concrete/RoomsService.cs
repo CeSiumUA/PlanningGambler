@@ -22,17 +22,20 @@ public class RoomsService : IRoomsService, IRoomManagerService
         _tokenService = tokenService;
     }
 
-    public async Task AddParticipantToRoom(PlanningParticipant planningParticipant)
+    public Task AddParticipantToRoom(PlanningParticipant planningParticipant)
     {
         var room = _roomStorage.GetRoom(planningParticipant.RoomId);
         if (room == null) throw new RoomNotFoundException(planningParticipant.RoomId);
         room.Participants.Add(planningParticipant);
+        return Task.CompletedTask;
     }
 
-    public async Task RemoveParticipantFromRoom(Guid roomId, Guid planningParticipantId)
+    public Task RemoveParticipantFromRoom(Guid roomId, Guid planningParticipantId)
     {
         var room = _roomStorage.GetRoom(roomId);
         if (room != null) room.Participants.RemoveAll(x => x.Id == planningParticipantId);
+
+        return Task.CompletedTask;
     }
 
     public NewStageResult? CreateVotingStage(Guid roomId, string title, DateTimeOffset? deadline = null)

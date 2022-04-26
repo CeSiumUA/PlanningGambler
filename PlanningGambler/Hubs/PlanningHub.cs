@@ -19,24 +19,26 @@ public class PlanningHub : Hub
         _roomManagerService = roomManagerService;
     }
 
-    public async Task<RoomDto?> FetchRoom()
+    public Task<RoomDto?> FetchRoom()
     {
-        if (Context.User == null) return null;
+        if (Context.User == null) return Task.FromResult<RoomDto?>(null);
 
         var roomId = RetrieveRoomId();
         var room = _roomManagerService.GetRoom(roomId);
-        //var currentStage = room.CurrentStage != null
-        //    ? new PlanningStage(room.CurrentStage.Id, room.CurrentStage.Title, new(), room.CurrentStage.Deadline) : null;
-        //return new RoomInfo(room.RoomId, room.Participants, currentStage, room.Stages.Select(x => new PlanningStage(x.Id, x.Title, new(), )))
-        return new RoomDto(room.RoomId,
-            room.Participants,
-            room.Stages.Select(x => new NewStageResult(x.Id, x.Title, x.Deadline)).ToList(),
-            room.JiraUrl)
-        {
-            CurrentStage = room.CurrentStage == null
-                ? null
-                : new NewStageResult(room.CurrentStage.Id, room.CurrentStage.Title, room.CurrentStage.Deadline)
-        };
+        return Task.FromResult<RoomDto?>(
+            new RoomDto(
+                room.RoomId,
+                room.Participants,
+                room.Stages.Select(x => new NewStageResult(x.Id, x.Title, x.Deadline)).ToList(),
+                room.JiraUrl)
+            {
+                CurrentStage = room.CurrentStage == null 
+                    ? null
+                    : new NewStageResult(
+                        room.CurrentStage.Id,
+                        room.CurrentStage.Title,
+                        room.CurrentStage.Deadline)
+            });
     }
 
     public async Task Vote(string vote)

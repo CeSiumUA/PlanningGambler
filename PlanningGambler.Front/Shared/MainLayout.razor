@@ -1,11 +1,11 @@
 ﻿@using PlanningGambler.Front.Pages.Dialogs
 @inherits LayoutComponentBase
-@inject IMatDialogService matDialogService
+@inject IMatDialogService MatDialogService
 
 <div class="page">
     <main>
-        <MatFAB style="position: fixed; right: 50px; bottom: 50px; z-index: 2;" OnClick="@ChangeMenuState" RefBack="buttonForwardRef" Icon="@GetButtonIcon()"></MatFAB>
-        <MatMenu @ref="Menu" TargetForwardRef="@buttonForwardRef">
+        <MatFAB style="position: fixed; right: 50px; bottom: 50px; z-index: 2;" OnClick="@ChangeMenuState" RefBack="_buttonForwardRef" Icon="@GetButtonIcon()"></MatFAB>
+        <MatMenu @ref="_menu" TargetForwardRef="@_buttonForwardRef">
             <MatList>
                 <MatListItem OnClick="@(_ => JoinRoom())">Join</MatListItem>
                 <MatListItem OnClick="@(_ => CreateRoom())">Create</MatListItem>
@@ -20,17 +20,17 @@
 
 @code
 {
-    readonly ForwardRef buttonForwardRef = new();
-    MatMenu Menu;
+    readonly ForwardRef _buttonForwardRef = new();
+    MatMenu? _menu;
 
     public async Task CreateRoom()
     {
-        await matDialogService.OpenAsync(typeof(CreateRoomDialog), null);
+        await MatDialogService.OpenAsync(typeof(CreateRoomDialog), null);
     }
 
     public async Task JoinRoom()
     {
-        await matDialogService.OpenAsync(typeof(JoinRoomDialog), null);
+        await MatDialogService.OpenAsync(typeof(JoinRoomDialog), null);
     }
 
     private string GetButtonIcon()
@@ -40,11 +40,11 @@
 
     private async Task ChangeMenuState()
     {
-        await Menu.OpenAsync();
+        await _menu!.OpenAsync();
     }
 
     private async Task CloseMenu()
     {
-        await Menu.CloseAsync();
+        await _menu!.CloseAsync();
     }
 }

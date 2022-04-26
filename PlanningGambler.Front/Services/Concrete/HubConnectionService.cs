@@ -83,7 +83,7 @@ public class HubConnectionService : IAsyncDisposable
 
     private void RegisterHandlers()
     {
-        _logger.LogInformation("Registering handlers");
+        _logger?.LogInformation("Registering handlers");
         _hubConnection.On<NewStageResult?>("StageCreated", x => { OnStageCreated?.Invoke(this, x); });
 
         _hubConnection.On<Guid>("StageSelected", x => { OnStageSelected?.Invoke(this, x); });
@@ -96,7 +96,7 @@ public class HubConnectionService : IAsyncDisposable
 
         _hubConnection.On<ParticipantsChangedDto>("ParticipantConnected", x =>
         {
-            _logger.LogInformation("Participant connected");
+            _logger?.LogInformation("Participant connected");
             OnParticipantConnected?.Invoke(this, x);
         });
 
