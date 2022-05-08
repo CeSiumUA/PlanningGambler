@@ -2,7 +2,7 @@
 
 public static class VoteOption
 {
-    public static readonly string[] VoteOptions = new string[]
+    public static readonly string[] VoteOptions =
     {
         "1",
         "2",

@@ -16,7 +16,7 @@ builder.Services.AddAuthentication(auth =>
     {
         options.SaveToken = true;
         options.RequireHttpsMetadata = true;
-        options.Events = new JwtBearerEvents()
+        options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
@@ -24,13 +24,11 @@ builder.Services.AddAuthentication(auth =>
                 var path = context.HttpContext.Request.Path;
                 if (!string.IsNullOrEmpty(accessToken) &&
                     path.StartsWithSegments("/planninghub"))
-                {
                     context.Token = accessToken;
-                }
                 return Task.CompletedTask;
             }
         };
-        options.TokenValidationParameters = new TokenValidationParameters()
+        options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidIssuer = TokenOptions.ValidIssuer,
             ValidateIssuer = true,
@@ -67,7 +65,7 @@ app.UseCors(policyBuilder =>
 {
     policyBuilder.AllowAnyHeader()
         .AllowAnyMethod()
-        .SetIsOriginAllowed((host) => true)
+        .SetIsOriginAllowed(host => true)
         .AllowCredentials();
 });
 
@@ -90,9 +88,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<PlanningHub>("/planninghub");
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapFallbackToFile("index.html");
-});
+app.UseEndpoints(endpoints => { endpoints.MapFallbackToFile("index.html"); });
 
 app.Run();

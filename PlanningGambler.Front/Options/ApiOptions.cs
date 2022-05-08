@@ -1,8 +1,7 @@
-﻿namespace PlanningGambler.Front.Options
+﻿namespace PlanningGambler.Front.Options;
+
+public class ApiOptions
 {
-    public class ApiOptions
-    {
-        public const string ApiOptionsName = "ApiOptions";
-        public string ApiUrl { get; set; } = string.Empty;
-    }
+    public const string ApiOptionsName = "ApiOptions";
+    public string ApiUrl { get; set; } = string.Empty;
 }

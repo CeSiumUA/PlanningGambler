@@ -4,16 +4,6 @@ namespace PlanningGambler.Shared.Dtos.Requests;
 
 public record BaseRoomRequest
 {
-    [Required]
-    [MinLength(1)]
-    public string DisplayName { get; init; }
-
-    public string? RoomPassword { get; init; }
-
-    public bool UseJira { get; init; }
-    
-    public string? JiraBaseAddress { get; init; }
-    
     public BaseRoomRequest(string displayName, string? password, bool? useJira, string? jiraBaseAddress)
     {
         DisplayName = displayName;
@@ -24,5 +14,16 @@ public record BaseRoomRequest
             JiraBaseAddress = jiraBaseAddress;
         }
     }
-    public BaseRoomRequest(){}
+
+    public BaseRoomRequest()
+    {
+    }
+
+    [Required] [MinLength(1)] public string DisplayName { get; init; }
+
+    public string? RoomPassword { get; init; }
+
+    public bool UseJira { get; init; }
+
+    public string? JiraBaseAddress { get; init; }
 }

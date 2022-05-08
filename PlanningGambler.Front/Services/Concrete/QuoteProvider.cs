@@ -2,26 +2,27 @@
 using PlanningGambler.Front.Models;
 using PlanningGambler.Front.Services.Abstract;
 
-namespace PlanningGambler.Front.Services.Concrete
+namespace PlanningGambler.Front.Services.Concrete;
+
+public class QuoteProvider : IQuoteProvider
 {
-    public class QuoteProvider : IQuoteProvider
+    private readonly HttpClient _httpClient;
+
+    public QuoteProvider(HttpClient httpClient)
     {
-        private readonly HttpClient _httpClient;
-        public QuoteProvider(HttpClient httpClient)
+        _httpClient = httpClient;
+    }
+
+    public async Task<string> GetQuoteOfTheDay()
+    {
+        try
         {
-            _httpClient = httpClient;
+            var response = await _httpClient.GetFromJsonAsync<QuoteResponseModel>("qod?language=en");
+            return response!.Contents.Quotes.First().Quote;
         }
-        public async Task<string> GetQuoteOfTheDay()
+        catch
         {
-            try
-            {
-                var response = await _httpClient.GetFromJsonAsync<QuoteResponseModel>("qod?language=en");
-                return response!.Contents.Quotes.First().Quote;
-            }
-            catch
-            {
-                return string.Empty;
-            }
+            return string.Empty;
         }
     }
 }

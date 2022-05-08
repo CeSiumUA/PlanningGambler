@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PlanningGambler.Dtos;
 using PlanningGambler.Models.Exceptions;
 using PlanningGambler.Services.Abstract;
 using PlanningGambler.Shared.Dtos;
@@ -18,17 +17,18 @@ public class RoomsController : ControllerBase
 
     public RoomsController(IRoomsService roomsService, IRoomStorage roomStorage)
     {
-        this._roomsService = roomsService;
-        this._roomStorage = roomStorage;
+        _roomsService = roomsService;
+        _roomStorage = roomStorage;
     }
 
     [ProducesResponseType(typeof(RoomToken), StatusCodes.Status200OK)]
     [HttpPost("create")]
-    public async Task<IActionResult> Create([FromBody]BaseRoomRequest request)
+    public async Task<IActionResult> Create([FromBody] BaseRoomRequest request)
     {
         try
         {
-            var tokenResult = await _roomsService.CreateRoom(request.DisplayName, request.RoomPassword, request.UseJira, request.JiraBaseAddress);
+            var tokenResult = await _roomsService.CreateRoom(request.DisplayName, request.RoomPassword, request.UseJira,
+                request.JiraBaseAddress);
             return new JsonResult(tokenResult);
         }
         catch
@@ -39,7 +39,7 @@ public class RoomsController : ControllerBase
 
     [ProducesResponseType(typeof(RoomToken), StatusCodes.Status200OK)]
     [HttpPost("join")]
-    public async Task<IActionResult> Join([FromBody]JoinRoomRequest request)
+    public async Task<IActionResult> Join([FromBody] JoinRoomRequest request)
     {
         try
         {
@@ -66,11 +66,11 @@ public class RoomsController : ControllerBase
 
     [Authorize]
     [HttpGet("verify")]
-    public async Task<IActionResult> Verify()
+    public Task<IActionResult> Verify()
     {
-        var roomId = Guid.Parse(this.HttpContext.User.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value);
+        var roomId = Guid.Parse(HttpContext.User.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value);
         var room = _roomStorage.GetRoom(roomId);
-        if (room == null) return NotFound();
-        return Ok();
+        if (room == null) return Task.FromResult<IActionResult>(NotFound());
+        return Task.FromResult<IActionResult>(Ok());
     }
 }
