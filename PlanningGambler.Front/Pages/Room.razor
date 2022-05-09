@@ -102,9 +102,12 @@
                             {
                                 <MatListItemPrimaryText>
                                     @stage.Title
-                                    <MatIconButton OnClick="() => SelectCurrentStage(stage.Id)">
-                                        <MatIcon>@MatIconNames.Check</MatIcon>
-                                    </MatIconButton>
+                                    @if (_roomToken!.MemberType == MemberType.Administrator)
+                                    {
+                                        <MatIconButton OnClick="() => SelectCurrentStage(stage.Id)">
+                                            <MatIcon>@MatIconNames.Check</MatIcon>
+                                        </MatIconButton>
+                                    }
                                     <MatIconButton Link="@GetTicketLink(stage)" Target="_blank">
                                         <MatIcon>@MatIconNames.Link</MatIcon>
                                     </MatIconButton>
