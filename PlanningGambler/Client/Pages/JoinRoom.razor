@@ -1,0 +1,24 @@
+﻿@page "/joinroom"
+@using MudBlazor
+@using PlanningGambler.Client.Models
+
+<PageTitle>Join Room</PageTitle>
+
+<MudCard>
+    <MudForm Model="@joinRoomModel">
+        <MudCardContent>
+            <MudTextField @bind-Value="joinRoomModel.RoomId" For="@(() => joinRoomModel.RoomId)" Label="Room Id" InputType="InputType.Text" />
+            <MudTextField @bind-Value="joinRoomModel.DisplayName" For="@(() => joinRoomModel.DisplayName)" Label="Display Name" id="name" />
+            <MudTextField @bind-Value="joinRoomModel.RoomPassword" Label="Room password (if needed)" InputType="InputType.Password" id="password" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton FullWidth ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Join</MudButton>
+        </MudCardActions>
+    </MudForm>
+</MudCard>
+
+@code {
+    MudForm form = default!;
+
+    JoinRoomModel joinRoomModel = new JoinRoomModel();
+}

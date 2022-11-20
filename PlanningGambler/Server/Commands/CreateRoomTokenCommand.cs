@@ -7,4 +7,5 @@ namespace PlanningGambler.Server.Commands;
 public record CreateRoomTokenCommand(
     Guid RoomId,
     string DisplayName,
-    MemberType MemberType) : IRequest<TokenResponse>;
+    MemberType MemberType,
+    string? Password = null) : IRequest<TokenResponse>;

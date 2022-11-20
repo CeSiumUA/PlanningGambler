@@ -23,8 +23,8 @@ namespace PlanningGambler.Server.Controllers
 
         public async Task<TokenResponse> CreateRoom(CreateRoomDto createRoomDto)
         {
-            var roomId = await _sender.Send(new CreateRoomCommand());
-            var tokenResult = await _sender.Send(new CreateRoomTokenCommand(roomId, createRoomDto.OwnerName, Shared.Data.MemberType.Administrator));
+            var roomId = await _sender.Send(new CreateRoomCommand(createRoomDto.Password));
+            var tokenResult = await _sender.Send(new CreateRoomTokenCommand(roomId, createRoomDto.OwnerName, Shared.Data.MemberType.Administrator, createRoomDto.Password));
             return tokenResult;
         }
 
@@ -33,7 +33,8 @@ namespace PlanningGambler.Server.Controllers
             var tokenResult = await _sender.Send(new CreateRoomTokenCommand(
                 joinRoomDto.RoomId,
                 joinRoomDto.DisplayName,
-                Shared.Data.MemberType.User));
+                Shared.Data.MemberType.User,
+                joinRoomDto.Password));
 
             return tokenResult;
         }

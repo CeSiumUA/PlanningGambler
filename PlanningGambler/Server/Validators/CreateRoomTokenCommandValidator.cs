@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using PlanningGambler.Server.Commands;
 using PlanningGambler.Server.Services.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PlanningGambler.Server.Validators;
 
@@ -12,12 +14,28 @@ public class CreateRoomTokenCommandValidator : AbstractValidator<CreateRoomToken
     {
         _roomStorage = roomStorage;
 
-        RuleFor(x => x.RoomId)
-            .MustAsync(IsRoomExists);
+        RuleFor(x => x)
+            .MustAsync(IsRoomExistsAndPasswordCorrect);
     }
 
-    private async Task<bool> IsRoomExists(Guid roomId, CancellationToken cancellationToken)
+    private async Task<bool> IsRoomExistsAndPasswordCorrect(CreateRoomTokenCommand command, CancellationToken cancellation)
     {
-        return await _roomStorage.GetRoom(roomId) != null;
+        var room = await _roomStorage.GetRoom(command.RoomId);
+
+        if (room == null) return false;
+
+        if (!string.IsNullOrEmpty(command.Password))
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var buffer = Encoding.UTF8.GetBytes(command.Password);
+                sha256.ComputeHash(buffer);
+                var encoded = Encoding.UTF8.GetString(buffer);
+
+                return encoded == room.PasswordHash;
+            }
+        }
+
+        return true;
     }
 }

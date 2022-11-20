@@ -1,8 +1,53 @@
 ﻿@page "/"
 @using MudBlazor
+@using PlanningGambler.Client.Services.Interfaces;
 
-<PageTitle>Index</PageTitle>
+@inject IRoomEntryProvider _roomEntryProvider
+@inject NavigationManager _navigationManager;
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
-<MudAlert Severity="Severity.Normal">You can find documentation and examples on our website here: <MudLink Href="https://mudblazor.com" Typo="Typo.body2" Color="Color.Inherit"><b>www.mudblazor.com</b></MudLink></MudAlert>
+<PageTitle>Home</PageTitle>
+
+<MudGrid Spacing="2" Justify="Justify.Center">
+    <MudItem>
+        <MudTooltip Text="Join an existing room using room id">
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.JoinInner" Color="Color.Primary" Size="Size.Large" OnClick="() => GoToJoinRoom()">Join</MudButton>
+        </MudTooltip>
+    </MudItem>
+    <MudItem>
+        <MudTooltip Text="Create new planning room">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Create" IconColor="Color.Secondary" Size="Size.Large" OnClick="() => GoToCreateRoom()">Create</MudButton>
+        </MudTooltip>
+    </MudItem>
+    <MudItem>
+        <MudTooltip Text="We've found your room! Press to return to it">
+            <MudButton Disabled="@IsRoomNotExists" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.KeyboardReturn" IconColor="Color.Secondary" Size="Size.Large" OnClick="() => GoToRoom()">Rejoin your previous room</MudButton>
+        </MudTooltip>
+    </MudItem>
+</MudGrid>
+
+@code{
+    private bool IsRoomNotExists = false;
+
+    private void GoToRoom()
+    {
+        _navigationManager.NavigateTo("/room");
+    }
+
+    private void GoToJoinRoom()
+    {
+        _navigationManager.NavigateTo("/joinroom");
+    }
+
+    private void GoToCreateRoom()
+    {
+        _navigationManager.NavigateTo("/createroom");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        IsRoomNotExists = !(await _roomEntryProvider.CheckTokenValidity());
+
+        await base.OnInitializedAsync();
+    }
+}

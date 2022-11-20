@@ -2,4 +2,4 @@
 
 namespace PlanningGambler.Server.Commands;
 
-public record CreateRoomCommand : IRequest<Guid>;
+public record CreateRoomCommand(string? Password = null) : IRequest<Guid>;

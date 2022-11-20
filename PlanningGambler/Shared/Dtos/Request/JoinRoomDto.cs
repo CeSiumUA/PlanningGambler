@@ -2,4 +2,5 @@
 
 public record JoinRoomDto(
     Guid RoomId,
-    string DisplayName);
+    string DisplayName,
+    string? Password = null);
