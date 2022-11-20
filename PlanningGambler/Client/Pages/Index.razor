@@ -50,7 +50,10 @@
     {
         var token = await _localStorageService.GetItemAsync<StoredToken?>("stored_token");
 
-        IsRoomNotExists = !(await _roomEntryProvider.CheckTokenValidity(token.Token));
+        if(token != null)
+        {
+            IsRoomNotExists = !(await _roomEntryProvider.CheckTokenValidity(token.Token));
+        }
 
         await base.OnInitializedAsync();
     }

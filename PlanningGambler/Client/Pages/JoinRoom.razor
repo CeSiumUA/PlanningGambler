@@ -3,6 +3,7 @@
 @using MudBlazor
 @using PlanningGambler.Client.Models
 @using PlanningGambler.Client.Services.Interfaces;
+@using Microsoft.AspNetCore.WebUtilities;
 
 @inject IRoomEntryProvider _roomEntryProvider
 @inject NavigationManager _navigationManager
@@ -12,7 +13,7 @@
 <MudCard>
     <MudForm Model="@joinRoomModel">
         <MudCardContent>
-            <MudTextField @bind-Value="joinRoomModel.RoomId" For="@(() => joinRoomModel.RoomId)" Label="Room Id" InputType="InputType.Text" />
+            <MudTextField ReadOnly="@IsRoomIdReadOnly" @bind-Value="joinRoomModel.RoomId" For="@(() => joinRoomModel.RoomId)" Label="Room Id" InputType="InputType.Text" />
             <MudTextField @bind-Value="joinRoomModel.DisplayName" For="@(() => joinRoomModel.DisplayName)" Label="Display Name" id="name" />
             <MudTextField @bind-Value="joinRoomModel.RoomPassword" Label="Room password (if needed)" InputType="InputType.Password" id="password" />
         </MudCardContent>
@@ -27,15 +28,26 @@
     [Parameter]
     public string? RoomId { get; set; }
 
+    private bool IsRoomIdReadOnly = false;
+
     MudForm form = default!;
 
     JoinRoomModel joinRoomModel = new JoinRoomModel();
 
     protected override Task OnInitializedAsync()
     {
-        if (!string.IsNullOrEmpty(RoomId))
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+
+        var parsedQuery = QueryHelpers.ParseNullableQuery(uri.Query);
+
+        if (parsedQuery != null && parsedQuery.TryGetValue("id", out var id))
         {
-            joinRoomModel.RoomId = Guid.Parse(RoomId);
+            RoomId = id.FirstOrDefault();
+            if (!string.IsNullOrEmpty(RoomId))
+            {
+                joinRoomModel.RoomId = Guid.Parse(RoomId!);
+                IsRoomIdReadOnly = true;
+            }
         }
 
         Console.WriteLine(joinRoomModel.RoomId);
