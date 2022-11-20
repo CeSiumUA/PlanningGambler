@@ -1,17 +1,21 @@
 ﻿using MediatR;
+using Microsoft.IdentityModel.Tokens;
 using PlanningGambler.Server.Commands;
 using PlanningGambler.Server.Services.Interfaces;
 using PlanningGambler.Shared.Dtos.Response;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace PlanningGambler.Server.Handlers;
 
 public class CreateRoomTokenCommandHandler : IRequestHandler<CreateRoomTokenCommand, TokenResponse>
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<CreateRoomTokenCommandHandler> _logger;
+    private readonly ITokenKeyProvider _tokenKeyProvider;
 
-    public CreateRoomTokenCommandHandler(ILogger logger)
+    public CreateRoomTokenCommandHandler(ITokenKeyProvider tokenKeyProvider, ILogger<CreateRoomTokenCommandHandler> logger)
     {
+        _tokenKeyProvider = tokenKeyProvider;
         _logger = logger;
     }
 
@@ -27,6 +31,22 @@ public class CreateRoomTokenCommandHandler : IRequestHandler<CreateRoomTokenComm
             new Claim(ClaimTypes.GroupSid, request.RoomId.ToString())
         };
 
+        var securityKey = new SymmetricSecurityKey(_tokenKeyProvider.GetKey());
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
+        var expiresAt = _tokenKeyProvider.GetExpireDate();
+        var tokenDescriptor = new JwtSecurityToken(
+            _tokenKeyProvider.GetIssuer(),
+            claims: claims,
+            expires: expiresAt.UtcDateTime,
+            signingCredentials: credentials);
 
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+
+        return Task.FromResult(new TokenResponse(
+            tokenString,
+            request.DisplayName,
+            request.MemberType,
+            expiresAt
+            ));
     }
 }

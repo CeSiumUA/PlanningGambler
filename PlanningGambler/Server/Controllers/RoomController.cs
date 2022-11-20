@@ -23,6 +23,7 @@ namespace PlanningGambler.Server.Controllers
         public Task<TokenResponse> CreateRoom(CreateRoomDto createRoomDto)
         {
             var roomId = _sender.Send(new CreateRoomCommand());
+
         }
 
         public Task<TokenResponse> JoinRoom(JoinRoomDto joinRoomDto)

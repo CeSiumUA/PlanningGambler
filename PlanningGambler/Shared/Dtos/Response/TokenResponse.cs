@@ -6,4 +6,4 @@ public record TokenResponse(
     string Token,
     string DisplayName,
     MemberType MemberType,
-    DateTime ExpiresAt);
+    DateTimeOffset ExpiresAt);
