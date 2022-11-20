@@ -1,6 +1,11 @@
 ﻿@page "/joinroom"
+@using Blazored.LocalStorage;
 @using MudBlazor
 @using PlanningGambler.Client.Models
+@using PlanningGambler.Client.Services.Interfaces;
+
+@inject IRoomEntryProvider _roomEntryProvider
+@inject NavigationManager _navigationManager
 
 <PageTitle>Join Room</PageTitle>
 
@@ -12,13 +17,41 @@
             <MudTextField @bind-Value="joinRoomModel.RoomPassword" Label="Room password (if needed)" InputType="InputType.Password" id="password" />
         </MudCardContent>
         <MudCardActions>
-            <MudButton FullWidth ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Join</MudButton>
+            <MudButton FullWidth ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => JoinSelectedRoom()">Join</MudButton>
         </MudCardActions>
     </MudForm>
 </MudCard>
 
 @code {
+
+    [Parameter]
+    public string? RoomId { get; set; }
+
     MudForm form = default!;
 
     JoinRoomModel joinRoomModel = new JoinRoomModel();
+
+    protected override Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(RoomId))
+        {
+            joinRoomModel.RoomId = Guid.Parse(RoomId);
+        }
+
+        Console.WriteLine(joinRoomModel.RoomId);
+
+        StateHasChanged();
+
+        return base.OnInitializedAsync();
+    }
+
+    public async Task JoinSelectedRoom()
+    {
+        var tokenResponse = await _roomEntryProvider.JoinRoom(joinRoomModel);
+
+        if(tokenResponse != null)
+        {
+            _navigationManager.NavigateTo("/room");
+        }
+    }
 }

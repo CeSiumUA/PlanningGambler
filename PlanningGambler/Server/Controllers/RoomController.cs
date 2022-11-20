@@ -21,6 +21,7 @@ namespace PlanningGambler.Server.Controllers
             _logger = logger;
         }
 
+        [HttpPost("create")]
         public async Task<TokenResponse> CreateRoom(CreateRoomDto createRoomDto)
         {
             var roomId = await _sender.Send(new CreateRoomCommand(createRoomDto.Password));
@@ -28,6 +29,7 @@ namespace PlanningGambler.Server.Controllers
             return tokenResult;
         }
 
+        [HttpPost("join")]
         public async Task<TokenResponse> JoinRoom(JoinRoomDto joinRoomDto)
         {
             var tokenResult = await _sender.Send(new CreateRoomTokenCommand(
@@ -39,16 +41,17 @@ namespace PlanningGambler.Server.Controllers
             return tokenResult;
         }
 
-        public async Task<bool> Verify()
+        [HttpGet("verify")]
+        public async Task<TokenValidationResponse> Verify()
         {
             try
             {
                 var roomId = Guid.Parse(HttpContext.User.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value);
-                return await _sender.Send(new ValidateTokenCommand(roomId));
+                return new TokenValidationResponse(await _sender.Send(new ValidateTokenCommand(roomId)));
             }
             catch
             {
-                return false;
+                return new TokenValidationResponse(false);
             }
         }
     }

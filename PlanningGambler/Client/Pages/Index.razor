@@ -1,9 +1,12 @@
 ﻿@page "/"
+@using Blazored.LocalStorage;
 @using MudBlazor
+@using PlanningGambler.Client.Models;
 @using PlanningGambler.Client.Services.Interfaces;
 
 @inject IRoomEntryProvider _roomEntryProvider
 @inject NavigationManager _navigationManager;
+@inject ILocalStorageService _localStorageService;
 
 <PageTitle>Home</PageTitle>
 
@@ -45,8 +48,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var token = await _localStorageService.GetItemAsync<StoredToken?>("stored_token");
 
-        IsRoomNotExists = !(await _roomEntryProvider.CheckTokenValidity());
+        IsRoomNotExists = !(await _roomEntryProvider.CheckTokenValidity(token.Token));
 
         await base.OnInitializedAsync();
     }

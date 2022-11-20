@@ -1,6 +1,10 @@
 ﻿@page "/createroom"
 @using MudBlazor
 @using PlanningGambler.Client.Models
+@using PlanningGambler.Client.Services.Interfaces;
+
+@inject IRoomEntryProvider _roomEntryProvider
+@inject NavigationManager _navigationManager
 
 <PageTitle>Create Room</PageTitle>
 
@@ -11,7 +15,7 @@
             <MudTextField @bind-Value="createRoomModel.RoomPassword" Label="Room password (if needed)" InputType="InputType.Password" id="password" />
         </MudCardContent>
         <MudCardActions>
-            <MudButton FullWidth ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Create Room</MudButton>
+            <MudButton FullWidth ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => CreateSelectedRoom()">Create Room</MudButton>
         </MudCardActions>
     </MudForm>
 </MudCard>
@@ -20,4 +24,14 @@
     MudForm form = default!;
 
     CreateRoomModel createRoomModel = new CreateRoomModel();
+
+    public async Task CreateSelectedRoom()
+    {
+        var tokenResponse = await _roomEntryProvider.CreateRoom(createRoomModel);
+
+        if(tokenResponse != null)
+        {
+            _navigationManager.NavigateTo("/room");
+        }
+    }
 }
