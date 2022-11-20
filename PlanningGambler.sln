@@ -8,11 +8,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanningGambler.Server", "PlanningGambler\Server\PlanningGambler.Server.csproj", "{A0FA3B6A-BF87-4C76-9A6B-B5A36A000C8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningGambler.Server", "PlanningGambler\Server\PlanningGambler.Server.csproj", "{A0FA3B6A-BF87-4C76-9A6B-B5A36A000C8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanningGambler.Client", "PlanningGambler\Client\PlanningGambler.Client.csproj", "{47FCA208-11E9-44FF-980F-9EAE0ADDDE15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningGambler.Client", "PlanningGambler\Client\PlanningGambler.Client.csproj", "{47FCA208-11E9-44FF-980F-9EAE0ADDDE15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanningGambler.Shared", "PlanningGambler\Shared\PlanningGambler.Shared.csproj", "{3B014202-219D-4458-880F-C0468A9A0045}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningGambler.Shared", "PlanningGambler\Shared\PlanningGambler.Shared.csproj", "{3B014202-219D-4458-880F-C0468A9A0045}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
