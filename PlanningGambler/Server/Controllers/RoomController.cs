@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlanningGambler.Server.Commands;
 using PlanningGambler.Shared.Dtos.Request;
 using PlanningGambler.Shared.Dtos.Response;
+using System.Security.Claims;
 
 namespace PlanningGambler.Server.Controllers
 {
@@ -20,20 +21,34 @@ namespace PlanningGambler.Server.Controllers
             _logger = logger;
         }
 
-        public Task<TokenResponse> CreateRoom(CreateRoomDto createRoomDto)
+        public async Task<TokenResponse> CreateRoom(CreateRoomDto createRoomDto)
         {
-            var roomId = _sender.Send(new CreateRoomCommand());
-
+            var roomId = await _sender.Send(new CreateRoomCommand());
+            var tokenResult = await _sender.Send(new CreateRoomTokenCommand(roomId, createRoomDto.OwnerName, Shared.Data.MemberType.Administrator));
+            return tokenResult;
         }
 
-        public Task<TokenResponse> JoinRoom(JoinRoomDto joinRoomDto)
+        public async Task<TokenResponse> JoinRoom(JoinRoomDto joinRoomDto)
         {
+            var tokenResult = await _sender.Send(new CreateRoomTokenCommand(
+                joinRoomDto.RoomId,
+                joinRoomDto.DisplayName,
+                Shared.Data.MemberType.User));
 
+            return tokenResult;
         }
 
-        public Task<bool> Verify()
+        public async Task<bool> Verify()
         {
-
+            try
+            {
+                var roomId = Guid.Parse(HttpContext.User.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value);
+                return await _sender.Send(new ValidateTokenCommand(roomId));
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
