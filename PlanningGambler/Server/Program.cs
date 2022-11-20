@@ -1,9 +1,11 @@
-using Microsoft.AspNetCore.ResponseCompression;
+using PlanningGambler.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+builder.Services
+    .AddBusinessLogic()
+    .AddRazorPages();
 
 var app = builder.Build();
 
