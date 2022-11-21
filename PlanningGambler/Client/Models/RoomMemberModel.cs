@@ -2,13 +2,11 @@
 
 namespace PlanningGambler.Client.Models;
 
-public class StoredToken
+public class RoomMemberModel
 {
-    public string Token { get; set; } = default!;
+    public Guid Id { get; set; }
 
     public string DisplayName { get; set; } = default!;
 
     public MemberType MemberType { get; set; }
-
-    public DateTimeOffset ExpiresAt { get; set; }
 }

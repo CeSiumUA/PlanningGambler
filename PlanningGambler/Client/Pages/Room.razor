@@ -1,18 +1,47 @@
 ﻿@page "/room"
 @using Blazored.LocalStorage;
+@using MudBlazor
 @using PlanningGambler.Client.Models;
 @using PlanningGambler.Client.Services.Interfaces;
+@using PlanningGambler.Client.Services;
+@using PlanningGambler.Shared.Dtos.Response;
 
 @inject IRoomEntryProvider _roomEntryProvider
 @inject ILocalStorageService _localStorageService
 @inject NavigationManager _navigationManager
+@inject HubConnectionService _hubConnectionService
+@inject InterComponentsService _interComponentsService
+@inject IJSRuntime _jsInterop
+@inject ISnackbar _snackBarService
 
 <PageTitle>Planning Room</PageTitle>
 
+@if (PlanningRoom != null)
+{
+    <MudGrid>
+        @foreach (var member in PlanningRoom.Members)
+        {
+            <MudItem>
+                <MudCard>
+                    <MudCardContent>
+                        <MudText>@member.DisplayName</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+else
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+
 @code {
+    private RoomModel PlanningRoom = default!;
+
     protected override async Task OnInitializedAsync()
     {
-        var token = await _localStorageService.GetItemAsync<StoredToken?>(AppConstants.TokenStoreKey);
+        var token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
 
         if(token != null)
         {
@@ -21,6 +50,10 @@
             {
                 _navigationManager.NavigateTo("/");
             }
+            else
+            {
+                await InitializeRoom(token.Token);
+            }
         }
         else
         {
@@ -28,5 +61,63 @@
         }
 
         await base.OnInitializedAsync();
+    }
+
+    private async Task InitializeRoom(string token)
+    {
+        await _hubConnectionService.StartConnectionAsync(token);
+        await RegisterHandlers();
+        await GetRoom();
+    }
+
+    private async Task GetRoom()
+    {
+        var room = await _hubConnectionService.GetRoom();
+
+        PlanningRoom = new RoomModel()
+        {
+            Id = room.Id,
+            CurrentStageId = room.CurrentStageId,
+            Stages = room.Stages.Select(stage => new RoomStageModel
+            {
+                Id = stage.Id,
+                IsInProgress = stage.IsInProgress,
+                Name = stage.Name,
+                Votes = stage.Votes.Select(vote => new RoomVoteModel
+                {
+                    Id = vote.Id,
+                    IsHidden = vote.IsVoteHidden,
+                    VoteType = vote.VoteType,
+                    MemberId = vote.MemberId
+                }).ToList()
+            }).ToList(),
+            Members = room.Members.Select(member => new RoomMemberModel
+            {
+                Id = member.Id,
+                DisplayName = member.DisplayName,
+                MemberType = member.MemberType
+            }).ToList()
+        };
+    }
+
+    private async Task RegisterHandlers()
+    {
+        _interComponentsService.ShareRoomEventTriggered += async (sender, e) => await ShareRoom(sender, e);
+    }
+
+    private async Task ShareRoom(object? sender, EventArgs e)
+    {
+        var baseUri = _navigationManager.BaseUri;
+
+        var shareUri = $"{baseUri}joinroom?id={PlanningRoom.Id}";
+
+        await _jsInterop.InvokeVoidAsync("navigator.clipboard.writeText", shareUri);
+
+        _snackBarService.Configuration.SnackbarVariant = Variant.Text;
+        _snackBarService.Configuration.ShowTransitionDuration = 500;
+        _snackBarService.Configuration.HideTransitionDuration = 500;
+        _snackBarService.Configuration.VisibleStateDuration = 700;
+
+        _snackBarService.Add("Joining link copied to clipboard", Severity.Success);
     }
 }

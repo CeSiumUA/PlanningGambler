@@ -3,6 +3,7 @@
 @using MudBlazor
 @using PlanningGambler.Client.Models;
 @using PlanningGambler.Client.Services.Interfaces;
+@using PlanningGambler.Shared.Dtos.Response;
 
 @inject IRoomEntryProvider _roomEntryProvider
 @inject NavigationManager _navigationManager;
@@ -48,7 +49,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await _localStorageService.GetItemAsync<StoredToken?>(AppConstants.TokenStoreKey);
+        var token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
 
         if(token != null)
         {

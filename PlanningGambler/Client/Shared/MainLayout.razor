@@ -1,5 +1,9 @@
 ﻿@using MudBlazor
+@using PlanningGambler.Client.Services;
 @inherits LayoutComponentBase
+
+@inject NavigationManager _navigationmanager
+@inject InterComponentsService _interComponentService;
 
 <MudThemeProvider IsDarkMode="@true" />
 <MudDialogProvider/>
@@ -9,6 +13,11 @@
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
+        <MudToolBar>
+            <MudTooltip Text="Copy joining link to clipboard">
+                <MudIconButton Icon="@Icons.Material.Outlined.Share" Color="Color.Inherit" OnClick="() => CopyJoinLink()" />
+            </MudTooltip>
+        </MudToolBar>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>
@@ -30,5 +39,10 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    void CopyJoinLink()
+    {
+        _interComponentService.ShareRoom();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlanningGambler.Server.Commands;
@@ -41,6 +42,7 @@ namespace PlanningGambler.Server.Controllers
             return tokenResult;
         }
 
+        [Authorize]
         [HttpGet("verify")]
         public async Task<TokenValidationResponse> Verify()
         {

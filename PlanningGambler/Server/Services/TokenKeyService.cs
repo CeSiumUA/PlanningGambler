@@ -5,7 +5,7 @@ namespace PlanningGambler.Server.Services;
 
 public class TokenKeyService : ITokenKeyProvider
 {
-    private static byte[] SecurityKey = new byte[512];
+    private static byte[] SecurityKey = new byte[256];
 
     public TokenKeyService()
     {
