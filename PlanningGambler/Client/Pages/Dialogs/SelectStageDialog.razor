@@ -1,0 +1,28 @@
+﻿@using MudBlazor;
+@using PlanningGambler.Client.Services;
+@inject InterComponentsService _interComponentsService
+
+<MudDialog>
+    <DialogContent>
+        <MudTimeline>
+            <MudTimelineItem>
+                <MudText>Item A</MudText>
+            </MudTimelineItem>
+            <MudTimelineItem>
+                <MudText>Item B</MudText>
+            </MudTimelineItem>
+            <MudTimelineItem>
+                <MudText>Item C</MudText>
+            </MudTimelineItem>
+        </MudTimeline>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+}

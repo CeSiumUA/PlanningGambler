@@ -4,6 +4,7 @@
 @using PlanningGambler.Client.Models;
 @using PlanningGambler.Client.Services.Interfaces;
 @using PlanningGambler.Client.Services;
+@using PlanningGambler.Shared.Data;
 @using PlanningGambler.Shared.Dtos.Response;
 
 @inject IRoomEntryProvider _roomEntryProvider
@@ -39,6 +40,8 @@ else
 @code {
     private RoomModel PlanningRoom = default!;
 
+    private Dictionary<Guid, VotingMemberModel> VotingMembers = new Dictionary<Guid, VotingMemberModel>();
+
     protected override async Task OnInitializedAsync()
     {
         var token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
@@ -66,7 +69,7 @@ else
     private async Task InitializeRoom(string token)
     {
         await _hubConnectionService.StartConnectionAsync(token);
-        await RegisterHandlers();
+        RegisterHandlers();
         await GetRoom();
     }
 
@@ -100,9 +103,26 @@ else
         };
     }
 
-    private async Task RegisterHandlers()
+    private void RegisterHandlers()
     {
         _interComponentsService.ShareRoomEventTriggered += async (sender, e) => await ShareRoom(sender, e);
+        _interComponentsService.VoteStated += async (sender, e) => await Vote(sender, e);
+        _interComponentsService.GetRoomStagesModelsRequested += () => PlanningRoom;
+    }
+
+    private async Task Vote(object? sender, VoteType vote)
+    {
+        var voteDto = await _hubConnectionService.Vote(vote);
+
+        var member = PlanningRoom.Members.First(x => x.Id == voteDto.MemberId);
+
+        VotingMembers[voteDto.MemberId] = new VotingMemberModel()
+            {
+                Id = voteDto.Id,
+                DisplayName = member.DisplayName,
+                MemberType = member.MemberType,
+                Vote = voteDto.VoteType
+            };
     }
 
     private async Task ShareRoom(object? sender, EventArgs e)

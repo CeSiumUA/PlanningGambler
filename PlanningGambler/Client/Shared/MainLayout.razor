@@ -1,9 +1,14 @@
 ﻿@using MudBlazor
+@using PlanningGambler.Client.Pages.Dialogs;
 @using PlanningGambler.Client.Services;
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Shared.Data;
+
 @inherits LayoutComponentBase
 
 @inject NavigationManager _navigationmanager
-@inject InterComponentsService _interComponentService;
+@inject InterComponentsService _interComponentService
+@inject IDialogService _dialogService
 
 <MudThemeProvider IsDarkMode="@true" />
 <MudDialogProvider/>
@@ -14,6 +19,21 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudSpacer />
         <MudToolBar>
+            @if (!string.IsNullOrEmpty(SelectedStageName))
+            {
+                <MudText>@SelectedStageName</MudText>
+            }
+            <MudTooltip Text="Select or create voting stage">
+                <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="OpenStagesDialog"></MudIconButton>
+            </MudTooltip>
+            <MudTooltip Text="Vote">
+                <MudMenu Icon="@Icons.Material.Outlined.HowToVote" Color="Color.Inherit">
+                    @foreach (var voteValue in AppConstants.VoteSelectValues)
+                    {
+                        <MudMenuItem OnClick="() => Vote(voteValue.Key)">@voteValue.Value</MudMenuItem>
+                    }
+                </MudMenu>
+            </MudTooltip>
             <MudTooltip Text="Copy joining link to clipboard">
                 <MudIconButton Icon="@Icons.Material.Outlined.Share" Color="Color.Inherit" OnClick="() => CopyJoinLink()" />
             </MudTooltip>
@@ -36,13 +56,35 @@
 
     bool _drawerOpen = true;
 
+    private string? SelectedStageName = null;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
 
+    void Vote(VoteType vote)
+    {
+        _interComponentService.Vote(vote);
+    }
+
     void CopyJoinLink()
     {
         _interComponentService.ShareRoom();
+    }
+
+    void OpenStagesDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        _dialogService.Show<SelectStageDialog>("Stages", options);
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        _interComponentService.SelectedStageChanged += (sender, e) =>
+        {
+            SelectedStageName = e;
+        };
+        return base.OnInitializedAsync();
     }
 }
