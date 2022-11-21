@@ -1,7 +1,9 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response;
+﻿using System.Text.Json.Serialization;
+
+namespace PlanningGambler.Shared.Dtos.Response;
 
 public record StageDto(
-    Guid Id,
-    string Name,
-    bool IsInProgress,
-    VoteDto[] Votes);
+    [property: JsonPropertyName("id")] Guid Id,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("isInProgress")] bool IsInProgress,
+    [property: JsonPropertyName("votes")] VoteDto[] Votes);

@@ -1,3 +1,5 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response;
+﻿using System.Text.Json.Serialization;
 
-public record TokenValidationResponse(bool IsValid);
+namespace PlanningGambler.Shared.Dtos.Response;
+
+public record TokenValidationResponse([property: JsonPropertyName("isValid")] bool IsValid);

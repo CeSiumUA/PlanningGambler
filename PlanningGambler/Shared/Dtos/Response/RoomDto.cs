@@ -1,7 +1,9 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response;
+﻿using System.Text.Json.Serialization;
+
+namespace PlanningGambler.Shared.Dtos.Response;
 
 public record RoomDto(
-    Guid Id,
-    MemberDto[] Members,
-    StageDto[] Stages,
-    Guid? CurrentStageId = null);
+    [property: JsonPropertyName("id")] Guid Id,
+    [property: JsonPropertyName("members")] MemberDto[] Members,
+    [property: JsonPropertyName("stages")] StageDto[] Stages,
+    [property: JsonPropertyName("currentStageId")] Guid? CurrentStageId = null);

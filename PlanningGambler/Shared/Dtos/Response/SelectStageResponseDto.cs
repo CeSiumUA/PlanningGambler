@@ -1,3 +1,7 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response;
+﻿using System.Text.Json.Serialization;
 
-public record SelectStageResponseDto(Guid StageId, bool IsSelected);
+namespace PlanningGambler.Shared.Dtos.Response;
+
+public record SelectStageResponseDto(
+    [property: JsonPropertyName("stageId")] Guid StageId,
+    [property: JsonPropertyName("isSelected")] bool IsSelected);

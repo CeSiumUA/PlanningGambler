@@ -1,5 +1,7 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response; 
+﻿using System.Text.Json.Serialization;
+
+namespace PlanningGambler.Shared.Dtos.Response; 
 
 public record CreateRoomDto(
-    string OwnerName,
-    string? Password = null);
+    [property:JsonPropertyName("ownerName")] string OwnerName,
+    [property: JsonPropertyName("password")] string? Password = null);

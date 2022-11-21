@@ -1,3 +1,5 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response;
+﻿using System.Text.Json.Serialization;
 
-public record MemberDisconnectedResponseDto(Guid UserId);
+namespace PlanningGambler.Shared.Dtos.Response;
+
+public record MemberDisconnectedResponseDto([property: JsonPropertyName("userId")] Guid UserId);

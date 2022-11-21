@@ -1,3 +1,5 @@
-﻿namespace PlanningGambler.Shared.Dtos.Response;
+﻿using System.Text.Json.Serialization;
 
-public record StageVotesResultDto(VoteDto[] Votes);
+namespace PlanningGambler.Shared.Dtos.Response;
+
+public record StageVotesResultDto([property: JsonPropertyName("votes")] VoteDto[] Votes);
