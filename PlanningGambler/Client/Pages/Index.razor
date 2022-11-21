@@ -48,7 +48,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await _localStorageService.GetItemAsync<StoredToken?>("stored_token");
+        var token = await _localStorageService.GetItemAsync<StoredToken?>(AppConstants.TokenStoreKey);
 
         if(token != null)
         {

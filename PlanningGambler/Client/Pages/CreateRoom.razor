@@ -1,9 +1,11 @@
 ﻿@page "/createroom"
+@using Blazored.LocalStorage;
 @using MudBlazor
 @using PlanningGambler.Client.Models
 @using PlanningGambler.Client.Services.Interfaces;
 
 @inject IRoomEntryProvider _roomEntryProvider
+@inject ILocalStorageService _localStorageService
 @inject NavigationManager _navigationManager
 
 <PageTitle>Create Room</PageTitle>
@@ -31,6 +33,7 @@
 
         if(tokenResponse != null)
         {
+            await _localStorageService.SetItemAsync(AppConstants.TokenStoreKey, tokenResponse);
             _navigationManager.NavigateTo("/room");
         }
     }

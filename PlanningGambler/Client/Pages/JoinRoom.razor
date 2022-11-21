@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.WebUtilities;
 
 @inject IRoomEntryProvider _roomEntryProvider
+@inject ILocalStorageService _localStorageService
 @inject NavigationManager _navigationManager
 
 <PageTitle>Join Room</PageTitle>
@@ -50,10 +51,6 @@
             }
         }
 
-        Console.WriteLine(joinRoomModel.RoomId);
-
-        StateHasChanged();
-
         return base.OnInitializedAsync();
     }
 
@@ -63,6 +60,7 @@
 
         if(tokenResponse != null)
         {
+            await _localStorageService.SetItemAsync(AppConstants.TokenStoreKey, tokenResponse);
             _navigationManager.NavigateTo("/room");
         }
     }

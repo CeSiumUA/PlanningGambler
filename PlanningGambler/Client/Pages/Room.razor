@@ -1,0 +1,32 @@
+﻿@page "/room"
+@using Blazored.LocalStorage;
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Client.Services.Interfaces;
+
+@inject IRoomEntryProvider _roomEntryProvider
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
+
+<PageTitle>Planning Room</PageTitle>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await _localStorageService.GetItemAsync<StoredToken?>(AppConstants.TokenStoreKey);
+
+        if(token != null)
+        {
+            var isTokenValid = await _roomEntryProvider.CheckTokenValidity(token.Token);
+            if (!isTokenValid)
+            {
+                _navigationManager.NavigateTo("/");
+            }
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/");
+        }
+
+        await base.OnInitializedAsync();
+    }
+}
