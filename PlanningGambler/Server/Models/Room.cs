@@ -10,4 +10,6 @@ public class Room
     public string? PasswordHash { get; set; }
 
     public List<RoomMember> Members { get; set; } = new();
+
+    public List<RoomStage> Stages { get; set; } = new();
 }

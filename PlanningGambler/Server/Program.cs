@@ -1,4 +1,5 @@
 using PlanningGambler.Server;
+using PlanningGambler.Server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+app.MapHub<RoomHub>("/planninghub");
 app.MapFallbackToFile("index.html");
 
 app.Run();
