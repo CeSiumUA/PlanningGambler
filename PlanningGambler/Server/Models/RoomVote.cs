@@ -4,7 +4,7 @@ namespace PlanningGambler.Server.Models;
 
 public class RoomVote
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public Guid MemberId { get; set; }
 

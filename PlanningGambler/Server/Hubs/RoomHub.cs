@@ -29,6 +29,14 @@ public class RoomHub : Hub
         return _sender.Send(new GetRoomCommand(roomId, memberId));
     }
 
+    public Task<StageDto> CreateStage(string stageName)
+    {
+        var roomId = RetrieveRoomId();
+        var memberId = RetrieveId();
+
+        return _sender.Send(new CreateStageCommand(roomId, memberId, stageName));
+    }
+
     private Guid RetrieveRoomId()
     {
         var roomId = Context.User?.Claims.First(x => x.Type == ClaimTypes.GroupSid).Value;
