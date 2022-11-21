@@ -3,5 +3,5 @@
 public record RoomDto(
     Guid Id,
     MemberDto[] Members,
-    StageDto[] Stages
-    );
+    StageDto[] Stages,
+    Guid? CurrentStageId = null);

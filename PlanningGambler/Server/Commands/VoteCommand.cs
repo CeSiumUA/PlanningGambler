@@ -4,4 +4,4 @@ using PlanningGambler.Shared.Dtos.Response;
 
 namespace PlanningGambler.Server.Commands;
 
-public record CreateStageCommand(Guid RoomId, Guid UserId, string RoomName, MemberType MemberType) : IRequest<StageDto>;
+public record VoteCommand(Guid UserId, Guid RoomId, VoteType Vote) : IRequest<VoteDto>;

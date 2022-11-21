@@ -11,5 +11,7 @@ public class Room
 
     public List<RoomMember> Members { get; set; } = new();
 
+    public Guid? CurrentStageId { get; set; } = null;
+
     public List<RoomStage> Stages { get; set; } = new();
 }

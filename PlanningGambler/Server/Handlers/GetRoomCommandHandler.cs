@@ -36,7 +36,8 @@ public class GetRoomCommandHandler : IRequestHandler<GetRoomCommand, RoomDto>
                     vote.MemberId,
                     stage.AreVotesHidden,
                     stage.AreVotesHidden ? null : vote.Vote)).ToArray())
-            ).ToArray());
+            ).ToArray(),
+            room.CurrentStageId);
 
         return roomDto;
     }
