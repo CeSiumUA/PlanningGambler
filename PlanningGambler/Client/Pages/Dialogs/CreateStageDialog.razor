@@ -1,0 +1,33 @@
+﻿@using MudBlazor;
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Client.Services;
+
+@inject InterComponentsService _interComponentsService
+@inject IDialogService _dialogService
+
+<MudDialog>
+    <TitleContent>
+        <MudText>Create stage</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="Stage.StageName" Label="Stage name" For="@(() => Stage.StageName)" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CreateStage">Create</MudButton>
+        <MudButton Color="Color.Error" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public CreateStageModel Stage { get; set; } = new();
+
+    void Cancel() => MudDialog.Cancel();
+
+    void CreateStage()
+    {
+        _interComponentsService.CreateStage(Stage.StageName);
+        MudDialog.Close(DialogResult.Ok(Stage.StageName));
+    }
+}

@@ -75,7 +75,7 @@
 
     void OpenStagesDialog()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Large };
         _dialogService.Show<SelectStageDialog>("Stages", options);
     }
 

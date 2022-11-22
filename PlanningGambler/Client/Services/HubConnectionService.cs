@@ -51,17 +51,17 @@ public class HubConnectionService : IAsyncDisposable
 
     public Task<VoteDto> Vote(VoteType vote)
     {
-        return _hubConnection.InvokeAsync<VoteDto>("Vote");
+        return _hubConnection.InvokeAsync<VoteDto>("Vote", vote);
     }
 
     public Task<StageDto> CreateStage(string stageName)
     {
-        return _hubConnection.InvokeAsync<StageDto>("CreateStage");
+        return _hubConnection.InvokeAsync<StageDto>("CreateStage", stageName);
     }
 
     public Task<SelectStageResponseDto> SelectStage(Guid stageId)
     {
-        return _hubConnection.InvokeAsync<SelectStageResponseDto>("SelectStage");
+        return _hubConnection.InvokeAsync<SelectStageResponseDto>("SelectStage", stageId);
     }
 
     private Task<string?> RetrieveToken()

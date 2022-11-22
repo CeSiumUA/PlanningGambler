@@ -1,18 +1,21 @@
 ﻿@using MudBlazor;
+@using PlanningGambler.Client.Models;
 @using PlanningGambler.Client.Services;
+
 @inject InterComponentsService _interComponentsService
+@inject IDialogService _dialogService
 
 <MudDialog>
     <DialogContent>
         <MudTimeline>
+            @foreach(var stage in PlanningRoom.Stages)
+            {
+                <MudTimelineItem Color="stage.IsInProgress ? Color.Primary : Color.Default">
+                    <MudText>@stage.Name</MudText>
+                </MudTimelineItem>
+            }
             <MudTimelineItem>
-                <MudText>Item A</MudText>
-            </MudTimelineItem>
-            <MudTimelineItem>
-                <MudText>Item B</MudText>
-            </MudTimelineItem>
-            <MudTimelineItem>
-                <MudText>Item C</MudText>
+                <MudButton Variant="Variant.Text" OnClick="CreateStage">Add Stage</MudButton>
             </MudTimelineItem>
         </MudTimeline>
     </DialogContent>
@@ -24,5 +27,32 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
+    private RoomModel PlanningRoom = default!;
+
     void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    void CreateStage()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Large };
+        _dialogService.Show<CreateStageDialog>("Create stage", options);
+    }
+
+    protected override void OnInitialized()
+    {
+        var room = _interComponentsService.GetStages();
+        if(room == null)
+        {
+            Close();
+            return;
+        }
+
+        PlanningRoom = room;
+
+        _interComponentsService.StageCreated += (_, s) =>
+        {
+            StateHasChanged();
+        };
+
+        base.OnInitialized();
+    }
 }

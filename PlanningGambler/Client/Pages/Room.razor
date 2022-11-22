@@ -105,12 +105,33 @@ else
 
     private void RegisterHandlers()
     {
-        _interComponentsService.ShareRoomEventTriggered += async (sender, e) => await ShareRoom(sender, e);
-        _interComponentsService.VoteStated += async (sender, e) => await Vote(sender, e);
+        _interComponentsService.ShareRoomEventTriggered += async (_, e) => await ShareRoom(e);
+        _interComponentsService.VoteStated += async (_, e) => await Vote(e);
         _interComponentsService.GetRoomStagesModelsRequested += () => PlanningRoom;
+        _interComponentsService.CreateStageRequested += async (_, e) => await CreateStage(e);
     }
 
-    private async Task Vote(object? sender, VoteType vote)
+    private async Task CreateStage(string stageName)
+    {
+        var stage = await _hubConnectionService.CreateStage(stageName);
+        PlanningRoom.Stages.Add(new RoomStageModel()
+        {
+            Id = stage.Id,
+            IsInProgress = stage.IsInProgress,
+            Name = stage.Name,
+            Votes = stage.Votes.Select(vote => new RoomVoteModel()
+            {
+                Id = vote.Id,
+                VoteType = vote.VoteType,
+                IsHidden = vote.IsVoteHidden,
+                MemberId = vote.MemberId
+            }).ToList()
+        });
+
+        _interComponentsService.InvokeStageCreated(stage);
+    }
+
+    private async Task Vote(VoteType vote)
     {
         var voteDto = await _hubConnectionService.Vote(vote);
 
@@ -125,7 +146,7 @@ else
             };
     }
 
-    private async Task ShareRoom(object? sender, EventArgs e)
+    private async Task ShareRoom(EventArgs e)
     {
         var baseUri = _navigationManager.BaseUri;
 
