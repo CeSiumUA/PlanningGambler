@@ -58,6 +58,8 @@
 
     private string? SelectedStageName = null;
 
+    private RoomModel? PlanningRoom = default;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -81,10 +83,21 @@
 
     protected override Task OnInitializedAsync()
     {
-        _interComponentService.SelectedStageChanged += (sender, e) =>
+        PlanningRoom = _interComponentService.GetStages();
+        if (PlanningRoom != null && PlanningRoom.CurrentStageId.HasValue)
         {
-            SelectedStageName = e;
+            SelectStage(PlanningRoom.CurrentStageId.Value);
+        }
+        _interComponentService.StageSelected += (sender, e) =>
+        {
+            SelectStage(e);
         };
         return base.OnInitializedAsync();
+    }
+
+    private void SelectStage(Guid id)
+    {
+        SelectedStageName = PlanningRoom?.Stages.First(x => x.Id == id).Name;
+        StateHasChanged();
     }
 }

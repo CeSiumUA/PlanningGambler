@@ -10,8 +10,6 @@ public class InterComponentsService
 
     public event EventHandler<VoteType>? VoteStated;
 
-    public event EventHandler<string>? SelectedStageChanged;
-
     public event EventHandler<string>? CreateStageRequested;
 
     public event EventHandler<StageDto>? StageCreated;
@@ -32,11 +30,6 @@ public class InterComponentsService
     public void Vote(VoteType voteType)
     {
         VoteStated?.Invoke(this, voteType);
-    }
-
-    public void SetSelectedStageName(string stageName)
-    {
-        SelectedStageChanged?.Invoke(this, stageName);
     }
 
     public RoomModel? GetStages()
