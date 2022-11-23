@@ -4,6 +4,8 @@ public class HubConstants
 {
     public const string StageChangedMethod = "StageChanged";
 
+    public const string StageCreatedMethod = "StageCreated";
+
     public const string MemberConnectedMethod = "MemberConnected";
 
     public const string MemberDisconnectedMethod = "MemberDisconnected";

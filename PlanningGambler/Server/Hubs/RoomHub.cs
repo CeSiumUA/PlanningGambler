@@ -79,13 +79,17 @@ public class RoomHub : Hub
     }
 
     [Authorize(Roles = "Administrator")]
-    public Task<StageDto> CreateStage(string stageName)
+    public async Task<StageDto> CreateStage(string stageName)
     {
         var roomId = RetrieveRoomId();
         var memberId = RetrieveId();
         var memberType = RetrieveMemberType();
 
-        return _sender.Send(new CreateStageCommand(roomId, memberId, stageName, memberType));
+        var stageDto = await _sender.Send(new CreateStageCommand(roomId, memberId, stageName, memberType));
+
+        await Clients.GroupExcept(roomId.ToString(), new[] { Context.ConnectionId }).SendAsync(HubConstants.StageCreatedMethod, stageDto);
+
+        return stageDto;
     }
 
     [Authorize(Roles = "Administrator")]

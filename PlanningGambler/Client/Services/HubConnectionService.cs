@@ -7,6 +7,7 @@ namespace PlanningGambler.Client.Services;
 public class HubConnectionService : IAsyncDisposable
 {
     public event EventHandler<SelectStageResponseDto>? StageSelected;
+    public event EventHandler<StageDto>? StageCreated;
     public event EventHandler<MemberConnectedResponseDto>? MemberConnected;
     public event EventHandler<MemberDisconnectedResponseDto>? MemberDisconnected;
     public event EventHandler<int>? CountDownOccured;
@@ -72,6 +73,8 @@ public class HubConnectionService : IAsyncDisposable
     private void RegisterHandlers()
     {
         _hubConnection.On<SelectStageResponseDto>(HubConstants.StageChangedMethod, x => StageSelected?.Invoke(this, x));
+
+        _hubConnection.On<StageDto>(HubConstants.StageCreatedMethod, x => StageCreated?.Invoke(this, x));
 
         _hubConnection.On<MemberConnectedResponseDto>(HubConstants.MemberConnectedMethod, x => MemberConnected?.Invoke(this, x));
 

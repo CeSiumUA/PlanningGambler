@@ -109,11 +109,14 @@ else
         _interComponentsService.VoteStated += async (_, e) => await Vote(e);
         _interComponentsService.GetRoomStagesModelsRequested += () => PlanningRoom;
         _interComponentsService.CreateStageRequested += async (_, e) => await CreateStage(e);
+        _interComponentsService.SelectStageRequested += async (_, e) => await SelectStage(e);
+
+        _hubConnectionService.StageCreated += (_, e) => HandleStageCreated(e);
+        _hubConnectionService.StageSelected += (_, e) => HandleStageSelected(e);
     }
 
-    private async Task CreateStage(string stageName)
+    private void HandleStageCreated(StageDto stage)
     {
-        var stage = await _hubConnectionService.CreateStage(stageName);
         PlanningRoom.Stages.Add(new RoomStageModel()
         {
             Id = stage.Id,
@@ -129,6 +132,27 @@ else
         });
 
         _interComponentsService.InvokeStageCreated(stage);
+    }
+
+    private void HandleStageSelected(SelectStageResponseDto selectionResult)
+    {
+        if (selectionResult.IsSelected)
+        {
+            PlanningRoom.CurrentStageId = selectionResult.StageId;
+            _interComponentsService.InvokeStageSelected(selectionResult.StageId);
+        }
+    }
+
+    private async Task SelectStage(Guid stageId)
+    {
+        var selectionResult = await _hubConnectionService.SelectStage(stageId);
+        HandleStageSelected(selectionResult);
+    }
+
+    private async Task CreateStage(string stageName)
+    {
+        var stage = await _hubConnectionService.CreateStage(stageName);
+        HandleStageCreated(stage);
     }
 
     private async Task Vote(VoteType vote)

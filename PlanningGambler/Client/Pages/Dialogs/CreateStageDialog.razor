@@ -10,7 +10,9 @@
         <MudText>Create stage</MudText>
     </TitleContent>
     <DialogContent>
-        <MudTextField @bind-Value="Stage.StageName" Label="Stage name" For="@(() => Stage.StageName)" />
+        <MudForm @ref="form" Model="@Stage">
+            <MudTextField @bind-Value="Stage.StageName" Label="Stage name" For="@(() => Stage.StageName)" />
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="CreateStage">Create</MudButton>
@@ -23,11 +25,17 @@
 
     [Parameter] public CreateStageModel Stage { get; set; } = new();
 
+    MudForm? form = default;
+
     void Cancel() => MudDialog.Cancel();
 
-    void CreateStage()
+    async Task CreateStage()
     {
-        _interComponentsService.CreateStage(Stage.StageName);
-        MudDialog.Close(DialogResult.Ok(Stage.StageName));
+        await form.Validate();
+        if (form.IsValid)
+        {
+            _interComponentsService.CreateStage(Stage.StageName);
+            MudDialog.Close(DialogResult.Ok(Stage.StageName));
+        }
     }
 }
