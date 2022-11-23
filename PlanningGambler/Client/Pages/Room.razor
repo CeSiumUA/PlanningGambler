@@ -115,6 +115,18 @@ else
 
         _hubConnectionService.StageCreated += (_, e) => HandleStageCreated(e);
         _hubConnectionService.StageSelected += (_, e) => HandleStageSelected(e);
+        _hubConnectionService.MemberConnected += (_, e) => HandleMemberConnected(e);
+    }
+
+    private void HandleMemberConnected(MemberConnectedResponseDto member)
+    {
+        PlanningRoom.Members.Add(new RoomMemberModel()
+        {
+            DisplayName = member.DisplayName,
+            Id = member.Userid,
+            MemberType = member.MemberType
+        });
+        StateHasChanged();
     }
 
     private void HandleStageCreated(StageDto stage)
