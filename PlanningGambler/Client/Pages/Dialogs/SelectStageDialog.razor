@@ -17,7 +17,7 @@
                     @foreach (var stage in PlanningRoom.Stages)
                     {
                         <MudTimelineItem Color="stage.Id == PlanningRoom.CurrentStageId ? Color.Primary : Color.Default">
-                            <MudFab Color="stage.Id == PlanningRoom.CurrentStageId ? Color.Primary : Color.Default" Disabled="@(Token!.MemberType != PlanningGambler.Shared.Data.MemberType.Administrator)" StartIcon="@(stage.Id == PlanningRoom.CurrentStageId ? Icons.Material.Filled.Check : Icons.Filled.RadioButtonUnchecked)" Size="Size.Small" OnClick="() => SelectStage(stage.Id)" Label="@stage.Name"></MudFab>
+                            <MudFab Color="stage.Id == PlanningRoom.CurrentStageId ? Color.Primary : Color.Default" Disabled="@(Token!.MemberType != PlanningGambler.Shared.Data.MemberType.Administrator)" StartIcon="@(stage.Id == PlanningRoom.CurrentStageId ? Icons.Material.Filled.RadioButtonChecked : Icons.Filled.RadioButtonUnchecked)" Size="Size.Small" OnClick="() => SelectStage(stage.Id)" Label="@stage.Name"></MudFab>
                         </MudTimelineItem>
                     }
                     @if (Token!.MemberType == PlanningGambler.Shared.Data.MemberType.Administrator)

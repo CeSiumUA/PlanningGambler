@@ -83,16 +83,26 @@
 
     protected override Task OnInitializedAsync()
     {
-        PlanningRoom = _interComponentService.GetStages();
-        if (PlanningRoom != null && PlanningRoom.CurrentStageId.HasValue)
+        LoadRoom(_interComponentService.GetStages());
+        _interComponentService.RoomCreated += (sender, e) =>
         {
-            SelectStage(PlanningRoom.CurrentStageId.Value);
-        }
+            LoadRoom(e);
+        };
+
         _interComponentService.StageSelected += (sender, e) =>
         {
             SelectStage(e);
         };
         return base.OnInitializedAsync();
+    }
+
+    private void LoadRoom(RoomModel? roomModel)
+    {
+        PlanningRoom = roomModel;
+        if (PlanningRoom != null && PlanningRoom.CurrentStageId.HasValue)
+        {
+            SelectStage(PlanningRoom.CurrentStageId.Value);
+        }
     }
 
     private void SelectStage(Guid id)

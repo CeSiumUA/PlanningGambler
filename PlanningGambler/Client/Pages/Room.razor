@@ -101,6 +101,8 @@ else
                 MemberType = member.MemberType
             }).ToList()
         };
+
+        _interComponentsService.InvokeRoomCreated(PlanningRoom);
     }
 
     private void RegisterHandlers()

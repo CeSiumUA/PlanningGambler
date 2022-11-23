@@ -18,6 +18,8 @@ public class InterComponentsService
 
     public event EventHandler<Guid>? StageSelected;
 
+    public event EventHandler<RoomModel>? RoomCreated;
+
     public event GetRoomStagesModels? GetRoomStagesModelsRequested;
 
     public delegate RoomModel GetRoomStagesModels();
@@ -55,5 +57,10 @@ public class InterComponentsService
     public void InvokeStageSelected(Guid stageId)
     {
         StageSelected?.Invoke(this, stageId);
+    }
+
+    public void InvokeRoomCreated(RoomModel roomModel)
+    {
+        RoomCreated?.Invoke(this, roomModel);
     }
 }
