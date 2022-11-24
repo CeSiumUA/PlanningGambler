@@ -128,12 +128,15 @@ else
             MemberType = member.MemberType
         });
         StateHasChanged();
+        ShowConfiguredSnackbar($"{member.DisplayName} joined the room", Severity.Info);
     }
 
     private void HandleMemberDisconnected(MemberDisconnectedResponseDto member)
     {
-        PlanningRoom.Members.RemoveAll(x => x.Id == member.UserId);
+        var membertoRemove = PlanningRoom.Members.First(x => x.Id == member.UserId);
+        PlanningRoom.Members.Remove(membertoRemove);
         StateHasChanged();
+        ShowConfiguredSnackbar($"{membertoRemove.DisplayName} left the room", Severity.Info);
     }
 
     private void HandleStageCreated(StageDto stage)
@@ -199,11 +202,16 @@ else
 
         await _jsInterop.InvokeVoidAsync("navigator.clipboard.writeText", shareUri);
 
+        ShowConfiguredSnackbar("Joining link copied to clipboard", Severity.Success);
+    }
+
+    private void ShowConfiguredSnackbar(string text, Severity severity = default)
+    {
         _snackBarService.Configuration.SnackbarVariant = Variant.Text;
         _snackBarService.Configuration.ShowTransitionDuration = 500;
         _snackBarService.Configuration.HideTransitionDuration = 500;
         _snackBarService.Configuration.VisibleStateDuration = 700;
 
-        _snackBarService.Add("Joining link copied to clipboard", Severity.Success);
+        _snackBarService.Add(text, severity);
     }
 }
