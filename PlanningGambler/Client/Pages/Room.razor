@@ -24,8 +24,16 @@
         {
             <MudItem>
                 <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText>@member.DisplayName</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
                     <MudCardContent>
-                        <MudText>@member.DisplayName</MudText>
+                        @if(PlanningRoom.CurrentStageId.HasValue){
+                            var memberVote = GetMemberVote(member.Id);
+                            <MudText>@(memberVote != null ? (memberVote.VoteType.HasValue ? memberVote.VoteType : "?") : string.Empty)</MudText>
+                        }
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -47,8 +55,6 @@ else
     private bool ShowOverlay = false;
 
     private int CountDownCounter;
-
-    private Dictionary<Guid, VotingMemberModel> VotingMembers = new Dictionary<Guid, VotingMemberModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,6 +78,13 @@ else
         }
 
         await base.OnInitializedAsync();
+    }
+
+    private RoomVoteModel? GetMemberVote(Guid memberId)
+    {
+        var stage = GetCurrentStage();
+
+        return stage.Votes.FirstOrDefault(x => x.MemberId == memberId);
     }
 
     private async Task InitializeRoom(string token)
@@ -127,11 +140,59 @@ else
         _hubConnectionService.MemberConnected += (_, e) => HandleMemberConnected(e);
         _hubConnectionService.MemberDisconnected += (_, e) => HandleMemberDisconnected(e);
         _hubConnectionService.CountDownOccured += (_, e) => HandleCountDownTicks(e);
+        _hubConnectionService.VoteOccured += (_, e) => HandleVoteOccured(e);
+        _hubConnectionService.VotesStated += (_, e) => HandleVoteStated(e);
+    }
+
+    private RoomStageModel GetCurrentStage()
+    {
+        return PlanningRoom.Stages.First(x => x.Id == PlanningRoom.CurrentStageId);
+    }
+
+    private void HandleVoteStated(StageVotesResultDto stageVotesResultDto)
+    {
+        var stage = GetCurrentStage();
+
+        ShowOverlay = false;
+
+        foreach(var stageVoteResult in stageVotesResultDto.Votes)
+        {
+            UpdateVote(stageVoteResult, stage);
+        }
+    }
+
+    private void HandleVoteOccured(VoteDto voteDto)
+    {
+        var stage = GetCurrentStage();
+
+        UpdateVote(voteDto, stage);
+    }
+
+    private void UpdateVote(VoteDto voteDto, RoomStageModel stage)
+    {
+        if (!stage.Votes.Any(x => x.Id == voteDto.Id))
+        {
+            stage.Votes.Add(new RoomVoteModel()
+                {
+                    Id = voteDto.Id,
+                    IsHidden = voteDto.IsVoteHidden,
+                    VoteType = voteDto.VoteType,
+                    MemberId = voteDto.MemberId
+                });
+        }
+        else
+        {
+            stage.Votes.First(x => x.Id == voteDto.Id).VoteType = voteDto.VoteType;
+        }
+
+        StateHasChanged();
     }
 
     private void HandleCountDownTicks(int seconds)
     {
+        ShowOverlay = true;
         CountDownCounter = seconds;
+        StateHasChanged();
     }
 
     private Task StartCountDown()
@@ -203,15 +264,7 @@ else
     {
         var voteDto = await _hubConnectionService.Vote(vote);
 
-        var member = PlanningRoom.Members.First(x => x.Id == voteDto.MemberId);
-
-        VotingMembers[voteDto.MemberId] = new VotingMemberModel()
-            {
-                Id = voteDto.Id,
-                DisplayName = member.DisplayName,
-                MemberType = member.MemberType,
-                Vote = voteDto.VoteType
-            };
+        HandleVoteOccured(voteDto);
     }
 
     private async Task ShareRoom(EventArgs e)
