@@ -2,7 +2,7 @@ name: Build and deploy .NET Core application to Web App planning-gambler
 on:
   push:
     branches:
-    - ui-refactoring
+    - master
 env:
   AZURE_WEBAPP_NAME: planning-gambler
   AZURE_WEBAPP_PACKAGE_PATH: PlanningGambler/Server/published
