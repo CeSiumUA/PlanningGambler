@@ -116,6 +116,7 @@ else
         _hubConnectionService.StageCreated += (_, e) => HandleStageCreated(e);
         _hubConnectionService.StageSelected += (_, e) => HandleStageSelected(e);
         _hubConnectionService.MemberConnected += (_, e) => HandleMemberConnected(e);
+        _hubConnectionService.MemberDisconnected += (_, e) => HandleMemberDisconnected(e);
     }
 
     private void HandleMemberConnected(MemberConnectedResponseDto member)
@@ -126,6 +127,12 @@ else
             Id = member.Userid,
             MemberType = member.MemberType
         });
+        StateHasChanged();
+    }
+
+    private void HandleMemberDisconnected(MemberDisconnectedResponseDto member)
+    {
+        PlanningRoom.Members.RemoveAll(x => x.Id == member.UserId);
         StateHasChanged();
     }
 
