@@ -1,0 +1,337 @@
+﻿@page "/room"
+@using Blazored.LocalStorage;
+@using MudBlazor
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Client.Services.Interfaces;
+@using PlanningGambler.Client.Services;
+@using PlanningGambler.Shared.Data;
+@using PlanningGambler.Shared.Dtos.Response;
+
+@inject IRoomEntryProvider _roomEntryProvider
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
+@inject HubConnectionService _hubConnectionService
+@inject InterComponentsService _interComponentsService
+@inject IJSRuntime _jsInterop
+@inject ISnackbar _snackBarService
+
+<PageTitle>Planning Room</PageTitle>
+
+@if (PingRequested)
+{
+    <audio autoplay hidden controls><source src="notification.wav" /></audio>
+}
+
+@if (PlanningRoom != null)
+{
+    <MudGrid Justify="Justify.FlexStart">
+        @foreach (var member in PlanningRoom.Members)
+        {
+            <MudItem>
+                <MudCard Style="min-width: 200px">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Align="@Align.Center">@member.DisplayName</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            @if (Token != null && Token.MemberType == MemberType.Administrator)
+                            {
+                                <MudMenu Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit">
+                                    <MudMenuItem OnClick="() => PingMember(member.Id)">Ping</MudMenuItem>
+                                </MudMenu>
+                            }
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if(PlanningRoom.CurrentStageId.HasValue){
+                            var voteDefinition = @GetMemberVote(member.Id);
+
+                            <MudText Align="@Align.Center" Typo="@Typo.h1" Color="@voteDefinition.StyleColor">@voteDefinition.StyledName</MudText>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+
+    <MudOverlay @bind-Visible="ShowOverlay" DarkBackground="true">
+        <MudText Typo="Typo.h1">@CountDownCounter</MudText>
+    </MudOverlay>
+}
+else
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+
+@code {
+    private RoomModel PlanningRoom = default!;
+
+    private bool ShowOverlay = false;
+
+    private TokenResponse? Token = default!;
+
+    private int CountDownCounter;
+
+    private bool PingRequested = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
+
+        if (Token != null)
+        {
+            var isTokenValid = await _roomEntryProvider.CheckTokenValidity(Token.Token);
+            if (!isTokenValid)
+            {
+                _navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                await InitializeRoom(Token.Token);
+            }
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/");
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private VoteDefinition GetMemberVote(Guid memberId)
+    {
+        var stage = GetCurrentStage();
+
+        var vote = stage.Votes.FirstOrDefault(x => x.MemberId == memberId);
+        if(vote == null)
+        {
+            return new VoteDefinition(string.Empty, string.Empty, double.NaN);
+        }
+
+        if(vote.IsHidden || !vote.VoteType.HasValue)
+        {
+            return new VoteDefinition(string.Empty, "?", double.NaN);
+        }
+
+        return AppConstants.VoteSelectValues[vote.VoteType.Value];
+    }
+
+    private async Task InitializeRoom(string token)
+    {
+        await _hubConnectionService.StartConnectionAsync(token);
+        RegisterHandlers();
+        await GetRoom();
+    }
+
+    private async Task PingMember(Guid memberId)
+    {
+        await _hubConnectionService.PingMember(memberId);
+    }
+
+    private async Task GetRoom()
+    {
+        var room = await _hubConnectionService.GetRoom();
+
+        PlanningRoom = new RoomModel()
+        {
+            Id = room.Id,
+            CurrentStageId = room.CurrentStageId,
+            Stages = room.Stages.Select(stage => new RoomStageModel
+            {
+                Id = stage.Id,
+                IsInProgress = stage.IsInProgress,
+                Name = stage.Name,
+                Votes = stage.Votes.Select(vote => new RoomVoteModel
+                {
+                    Id = vote.Id,
+                    IsHidden = vote.IsVoteHidden,
+                    VoteType = vote.VoteType,
+                    MemberId = vote.MemberId
+                }).ToList()
+            }).ToList(),
+            Members = room.Members.Select(member => new RoomMemberModel
+            {
+                Id = member.Id,
+                DisplayName = member.DisplayName,
+                MemberType = member.MemberType
+            }).ToList()
+        };
+
+        _interComponentsService.InvokeRoomCreated(PlanningRoom);
+    }
+
+    private void RegisterHandlers()
+    {
+        _interComponentsService.ShareRoomEventTriggered += async (_, e) => await ShareRoom(e);
+        _interComponentsService.VoteStated += async (_, e) => await Vote(e);
+        _interComponentsService.GetRoomStagesModelsRequested += () => PlanningRoom;
+        _interComponentsService.CreateStageRequested += async (_, e) => await CreateStage(e);
+        _interComponentsService.SelectStageRequested += async (_, e) => await SelectStage(e);
+        _interComponentsService.StartCountdownTriggered += async (_, _) => await StartCountDown();
+
+        _hubConnectionService.StageCreated += (_, e) => HandleStageCreated(e);
+        _hubConnectionService.StageSelected += (_, e) => HandleStageSelected(e);
+        _hubConnectionService.MemberConnected += (_, e) => HandleMemberConnected(e);
+        _hubConnectionService.MemberDisconnected += (_, e) => HandleMemberDisconnected(e);
+        _hubConnectionService.CountDownOccured += (_, e) => HandleCountDownTicks(e);
+        _hubConnectionService.VoteOccured += (_, e) => HandleVoteOccured(e);
+        _hubConnectionService.VotesStated += (_, e) => HandleVoteStated(e);
+        _hubConnectionService.PingRequested += (_, _) => HandlePingRequested();
+    }
+
+    private RoomStageModel GetCurrentStage()
+    {
+        return PlanningRoom.Stages.First(x => x.Id == PlanningRoom.CurrentStageId);
+    }
+
+    private void HandlePingRequested()
+    {
+        PingRequested = false;
+        StateHasChanged();
+        PingRequested = true;
+        StateHasChanged();
+    }
+
+    private void HandleVoteStated(StageVotesResultDto stageVotesResultDto)
+    {
+        var stage = GetCurrentStage();
+
+        ShowOverlay = false;
+
+        foreach(var stageVoteResult in stageVotesResultDto.Votes)
+        {
+            UpdateVote(stageVoteResult, stage);
+        }
+
+        _interComponentsService.InvokeVotingOccured();
+    }
+
+    private void HandleVoteOccured(VoteDto voteDto)
+    {
+        var stage = GetCurrentStage();
+
+        UpdateVote(voteDto, stage);
+    }
+
+    private void UpdateVote(VoteDto voteDto, RoomStageModel stage)
+    {
+        if (!stage.Votes.Any(x => x.Id == voteDto.Id))
+        {
+            stage.Votes.Add(new RoomVoteModel()
+                {
+                    Id = voteDto.Id,
+                    IsHidden = voteDto.IsVoteHidden,
+                    VoteType = voteDto.VoteType,
+                    MemberId = voteDto.MemberId
+                });
+        }
+        else
+        {
+            var vote = stage.Votes.First(x => x.Id == voteDto.Id);
+            vote.VoteType = voteDto.VoteType;
+            vote.IsHidden = voteDto.IsVoteHidden;
+        }
+
+        StateHasChanged();
+    }
+
+    private void HandleCountDownTicks(int seconds)
+    {
+        ShowOverlay = true;
+        CountDownCounter = seconds;
+        StateHasChanged();
+    }
+
+    private Task StartCountDown()
+    {
+        return _hubConnectionService.StartCountdown();
+    }
+
+    private void HandleMemberConnected(MemberConnectedResponseDto member)
+    {
+        PlanningRoom.Members.Add(new RoomMemberModel()
+        {
+            DisplayName = member.DisplayName,
+            Id = member.Userid,
+            MemberType = member.MemberType
+        });
+        StateHasChanged();
+        ShowConfiguredSnackbar($"{member.DisplayName} joined the room", Severity.Info);
+    }
+
+    private void HandleMemberDisconnected(MemberDisconnectedResponseDto member)
+    {
+        var membertoRemove = PlanningRoom.Members.First(x => x.Id == member.UserId);
+        PlanningRoom.Members.Remove(membertoRemove);
+        StateHasChanged();
+        ShowConfiguredSnackbar($"{membertoRemove.DisplayName} left the room", Severity.Info);
+    }
+
+    private void HandleStageCreated(StageDto stage)
+    {
+        PlanningRoom.Stages.Add(new RoomStageModel()
+        {
+            Id = stage.Id,
+            IsInProgress = stage.IsInProgress,
+            Name = stage.Name,
+            Votes = stage.Votes.Select(vote => new RoomVoteModel()
+            {
+                Id = vote.Id,
+                VoteType = vote.VoteType,
+                IsHidden = vote.IsVoteHidden,
+                MemberId = vote.MemberId
+            }).ToList()
+        });
+
+        _interComponentsService.InvokeStageCreated(stage);
+    }
+
+    private void HandleStageSelected(SelectStageResponseDto selectionResult)
+    {
+        if (selectionResult.IsSelected)
+        {
+            PlanningRoom.CurrentStageId = selectionResult.StageId;
+            _interComponentsService.InvokeStageSelected(selectionResult.StageId);
+        }
+    }
+
+    private async Task SelectStage(Guid stageId)
+    {
+        var selectionResult = await _hubConnectionService.SelectStage(stageId);
+        HandleStageSelected(selectionResult);
+    }
+
+    private async Task CreateStage(string stageName)
+    {
+        var stage = await _hubConnectionService.CreateStage(stageName);
+        HandleStageCreated(stage);
+    }
+
+    private async Task Vote(VoteType vote)
+    {
+        var voteDto = await _hubConnectionService.Vote(vote);
+
+        HandleVoteOccured(voteDto);
+    }
+
+    private async Task ShareRoom(EventArgs e)
+    {
+        var baseUri = _navigationManager.BaseUri;
+
+        var shareUri = $"{baseUri}joinroom?id={PlanningRoom.Id}";
+
+        await _jsInterop.InvokeVoidAsync("navigator.clipboard.writeText", shareUri);
+
+        ShowConfiguredSnackbar("Joining link copied to clipboard", Severity.Success);
+    }
+
+    private void ShowConfiguredSnackbar(string text, Severity severity = default)
+    {
+        _snackBarService.Configuration.SnackbarVariant = Variant.Text;
+        _snackBarService.Configuration.ShowTransitionDuration = 500;
+        _snackBarService.Configuration.HideTransitionDuration = 500;
+        _snackBarService.Configuration.VisibleStateDuration = 700;
+
+        _snackBarService.Add(text, severity);
+    }
+}

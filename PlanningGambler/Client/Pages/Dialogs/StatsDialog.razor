@@ -1,0 +1,71 @@
+﻿@using MudBlazor;
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Client.Services;
+
+@inject InterComponentsService _interComponentsService
+@inject IDialogService _dialogService
+
+<MudDialog>
+    <TitleContent>
+        <MudText>Voting stats</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTabs>
+            <MudTabPanel Text="Votes count">
+                <MudChart ChartType="ChartType.Pie" InputData="@TypeData" InputLabels="@TypeLabels"></MudChart>
+            </MudTabPanel>
+            <MudTabPanel Text="Votes by user">
+                <MudChart Width="100%" Height="350px" ChartType="ChartType.Bar" ChartSeries="@VoteData" XAxisLabels="@VoteLabels"></MudChart>
+            </MudTabPanel>
+        </MudTabs>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    private RoomModel PlanningRoom = default!;
+
+    private double[] TypeData = new double[0];
+
+    private string[] TypeLabels = new string[0];
+
+    private List<ChartSeries> VoteData = new List<ChartSeries>();
+
+    private string[] VoteLabels = new string[0];
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    protected override async Task OnInitializedAsync()
+    {
+        PlanningRoom = _interComponentsService.GetStages()!;
+
+        var stage = PlanningRoom.Stages.First(x => x.Id == PlanningRoom.CurrentStageId);
+
+        var grp = stage.Votes.Where(x => x.VoteType.HasValue).GroupBy(x => x.VoteType);
+
+        TypeLabels = grp.Select(x => AppConstants.VoteSelectValues[x.Key!.Value].DisplayName).ToArray();
+
+        TypeData = grp.Select(x => (double)x.Count()).ToArray();
+
+        var members = PlanningRoom.Members.Where(x => stage.Votes.Where(x => x.VoteType.HasValue).Select(x => x.MemberId).Contains(x.Id));
+
+        VoteLabels = members.Select(x => x.DisplayName).ToArray();
+
+        var votes = stage.Votes.Where(x => x.VoteType.HasValue).ToDictionary(k => k.MemberId, v => v.VoteType);
+
+        VoteData.Clear();
+        VoteData.Add(new ChartSeries()
+            {
+                Name = "Vote",
+                Data = members.Select(x => AppConstants.VoteSelectValues[votes[x.Id]!.Value].Value).ToArray()
+            });
+
+        StateHasChanged();
+
+        await base.OnInitializedAsync();
+    }
+}

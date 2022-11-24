@@ -1,0 +1,40 @@
+﻿@page "/createroom"
+@using Blazored.LocalStorage;
+@using MudBlazor
+@using PlanningGambler.Client.Models
+@using PlanningGambler.Client.Services.Interfaces;
+
+@inject IRoomEntryProvider _roomEntryProvider
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
+
+<PageTitle>Create Room</PageTitle>
+
+<MudCard>
+    <MudForm Model="@createRoomModel">
+        <MudCardContent>
+            <MudTextField @bind-Value="createRoomModel.DisplayName" For="@(() => createRoomModel.DisplayName)" Label="Display Name" id="name" />
+            <MudTextField @bind-Value="createRoomModel.RoomPassword" Label="Room password (if needed)" InputType="InputType.Password" id="password" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton FullWidth ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => CreateSelectedRoom()">Create Room</MudButton>
+        </MudCardActions>
+    </MudForm>
+</MudCard>
+
+@code {
+    MudForm form = default!;
+
+    CreateRoomModel createRoomModel = new CreateRoomModel();
+
+    public async Task CreateSelectedRoom()
+    {
+        var tokenResponse = await _roomEntryProvider.CreateRoom(createRoomModel);
+
+        if(tokenResponse != null)
+        {
+            await _localStorageService.SetItemAsync(AppConstants.TokenStoreKey, tokenResponse);
+            _navigationManager.NavigateTo("/room");
+        }
+    }
+}

@@ -1,0 +1,83 @@
+﻿@using Blazored.LocalStorage;
+@using MudBlazor;
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Client.Services;
+@using PlanningGambler.Shared.Dtos.Response;
+
+@inject InterComponentsService _interComponentsService
+@inject IDialogService _dialogService
+@inject ILocalStorageService _localStorageService
+
+<MudDialog>
+    <DialogContent>
+        <MudPaper MaxHeight="600px" Style="overflow: scroll">
+            <MudTimeline TimelineAlign="TimelineAlign.Start" TimelinePosition="TimelinePosition.Left">
+                @if (Token != null && PlanningRoom != null)
+                {
+                    @foreach (var stage in PlanningRoom.Stages)
+                    {
+                        <MudTimelineItem Color="stage.Id == PlanningRoom.CurrentStageId ? Color.Primary : Color.Default">
+                            <MudFab Color="stage.Id == PlanningRoom.CurrentStageId ? Color.Primary : Color.Default" Disabled="@(Token!.MemberType != PlanningGambler.Shared.Data.MemberType.Administrator)" StartIcon="@(stage.Id == PlanningRoom.CurrentStageId ? Icons.Material.Filled.RadioButtonChecked : Icons.Filled.RadioButtonUnchecked)" Size="Size.Small" OnClick="() => SelectStage(stage.Id)" Label="@stage.Name"></MudFab>
+                        </MudTimelineItem>
+                    }
+                    @if (Token!.MemberType == PlanningGambler.Shared.Data.MemberType.Administrator)
+                    {
+                        <MudTimelineItem>
+                            <MudButton Variant="Variant.Text" OnClick="CreateStage">Add Stage</MudButton>
+                        </MudTimelineItem>
+                    }
+                }
+            </MudTimeline>
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    private RoomModel PlanningRoom = default!;
+
+    private TokenResponse? Token = default!;
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    void SelectStage(Guid id)
+    {
+        _interComponentsService.SelectStage(id);
+    }
+
+    void CreateStage()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Large };
+        _dialogService.Show<CreateStageDialog>("Create stage", options);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
+
+        var room = _interComponentsService.GetStages();
+        if(room == null)
+        {
+            Close();
+            return;
+        }
+
+        PlanningRoom = room;
+
+        _interComponentsService.StageCreated += (_, s) =>
+        {
+            StateHasChanged();
+        };
+
+        _interComponentsService.StageSelected += (_, s) =>
+        {
+            StateHasChanged();
+        };
+
+        await base.OnInitializedAsync();
+    }
+}

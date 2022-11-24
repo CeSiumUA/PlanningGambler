@@ -1,0 +1,67 @@
+﻿@page "/joinroom"
+@using Blazored.LocalStorage;
+@using MudBlazor
+@using PlanningGambler.Client.Models
+@using PlanningGambler.Client.Services.Interfaces;
+@using Microsoft.AspNetCore.WebUtilities;
+
+@inject IRoomEntryProvider _roomEntryProvider
+@inject ILocalStorageService _localStorageService
+@inject NavigationManager _navigationManager
+
+<PageTitle>Join Room</PageTitle>
+
+<MudCard>
+    <MudForm Model="@joinRoomModel">
+        <MudCardContent>
+            <MudTextField ReadOnly="@IsRoomIdReadOnly" @bind-Value="joinRoomModel.RoomId" For="@(() => joinRoomModel.RoomId)" Label="Room Id" InputType="InputType.Text" />
+            <MudTextField @bind-Value="joinRoomModel.DisplayName" For="@(() => joinRoomModel.DisplayName)" Label="Display Name" id="name" />
+            <MudTextField @bind-Value="joinRoomModel.RoomPassword" Label="Room password (if needed)" InputType="InputType.Password" id="password" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton FullWidth ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" OnClick="() => JoinSelectedRoom()">Join</MudButton>
+        </MudCardActions>
+    </MudForm>
+</MudCard>
+
+@code {
+
+    [Parameter]
+    public string? RoomId { get; set; }
+
+    private bool IsRoomIdReadOnly = false;
+
+    MudForm form = default!;
+
+    JoinRoomModel joinRoomModel = new JoinRoomModel();
+
+    protected override Task OnInitializedAsync()
+    {
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
+
+        var parsedQuery = QueryHelpers.ParseNullableQuery(uri.Query);
+
+        if (parsedQuery != null && parsedQuery.TryGetValue("id", out var id))
+        {
+            RoomId = id.FirstOrDefault();
+            if (!string.IsNullOrEmpty(RoomId))
+            {
+                joinRoomModel.RoomId = Guid.Parse(RoomId!);
+                IsRoomIdReadOnly = true;
+            }
+        }
+
+        return base.OnInitializedAsync();
+    }
+
+    public async Task JoinSelectedRoom()
+    {
+        var tokenResponse = await _roomEntryProvider.JoinRoom(joinRoomModel);
+
+        if(tokenResponse != null)
+        {
+            await _localStorageService.SetItemAsync(AppConstants.TokenStoreKey, tokenResponse);
+            _navigationManager.NavigateTo("/room");
+        }
+    }
+}
