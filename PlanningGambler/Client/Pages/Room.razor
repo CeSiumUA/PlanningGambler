@@ -194,7 +194,9 @@ else
         }
         else
         {
-            stage.Votes.First(x => x.Id == voteDto.Id).VoteType = voteDto.VoteType;
+            var vote = stage.Votes.First(x => x.Id == voteDto.Id);
+            vote.VoteType = voteDto.VoteType;
+            vote.IsHidden = voteDto.IsVoteHidden;
         }
 
         StateHasChanged();

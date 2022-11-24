@@ -26,23 +26,29 @@
             {
                 <MudText>@SelectedStageName</MudText>
             }
-            <MudTooltip Text="Select or create voting stage">
-                <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="OpenStagesDialog"></MudIconButton>
-            </MudTooltip>
-            @if (Token != null && Token.MemberType == MemberType.Administrator && PlanningRoom != null && PlanningRoom.CurrentStageId.HasValue)
+            @if (Token != null && PlanningRoom != null)
             {
-                <MudTooltip Text="Start countdown">
-                    <MudIconButton Icon="@Icons.Material.Outlined.PlayArrow" OnClick="StartCountdown"></MudIconButton>
+                <MudTooltip Text="Select or create voting stage">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="OpenStagesDialog"></MudIconButton>
                 </MudTooltip>
-            }
-            <MudTooltip Text="Vote">
-                <MudMenu Icon="@Icons.Material.Outlined.HowToVote" Color="Color.Inherit">
-                    @foreach (var voteValue in AppConstants.VoteSelectValues)
+                @if (PlanningRoom.CurrentStageId.HasValue)
+                {
+                    if (Token.MemberType == MemberType.Administrator)
                     {
-                        <MudMenuItem OnClick="() => Vote(voteValue.Key)">@voteValue.Value.DisplayName</MudMenuItem>
+                        <MudTooltip Text="Start countdown">
+                            <MudIconButton Icon="@Icons.Material.Outlined.PlayArrow" OnClick="StartCountdown"></MudIconButton>
+                        </MudTooltip>
                     }
-                </MudMenu>
-            </MudTooltip>
+                    <MudTooltip Text="Vote">
+                        <MudMenu Icon="@Icons.Material.Outlined.HowToVote" Color="Color.Inherit">
+                            @foreach (var voteValue in AppConstants.VoteSelectValues)
+                            {
+                                <MudMenuItem OnClick="() => Vote(voteValue.Key)">@voteValue.Value.DisplayName</MudMenuItem>
+                            }
+                        </MudMenu>
+                    </MudTooltip>
+                }
+            }
             <MudTooltip Text="Copy joining link to clipboard">
                 <MudIconButton Icon="@Icons.Material.Outlined.Share" Color="Color.Inherit" OnClick="() => CopyJoinLink()" />
             </MudTooltip>
@@ -123,6 +129,7 @@
                 SelectStage(PlanningRoom.CurrentStageId.Value);
             }
         }
+        StateHasChanged();
     }
 
     private void SelectStage(Guid id)
