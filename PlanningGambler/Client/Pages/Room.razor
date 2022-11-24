@@ -171,6 +171,8 @@ else
         {
             UpdateVote(stageVoteResult, stage);
         }
+
+        _interComponentsService.InvokeVotingOccured();
     }
 
     private void HandleVoteOccured(VoteDto voteDto)

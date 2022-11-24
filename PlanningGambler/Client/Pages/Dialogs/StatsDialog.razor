@@ -1,0 +1,47 @@
+﻿@using MudBlazor;
+@using PlanningGambler.Client.Models;
+@using PlanningGambler.Client.Services;
+
+@inject InterComponentsService _interComponentsService
+@inject IDialogService _dialogService
+
+<MudDialog>
+    <TitleContent>
+        <MudText>Voting stats</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudChart ChartType="ChartType.Pie" InputData="@Data" InputLabels="@TypeLabels"></MudChart>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    private RoomModel PlanningRoom = default!;
+
+    private double[] Data = new double[0];
+
+    private string[] TypeLabels = new string[0];
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    protected override async Task OnInitializedAsync()
+    {
+        PlanningRoom = _interComponentsService.GetStages()!;
+
+        var stage = PlanningRoom.Stages.First(x => x.Id == PlanningRoom.CurrentStageId);
+
+        var grp = stage.Votes.Where(x => x.VoteType.HasValue).GroupBy(x => x.VoteType);
+
+        TypeLabels = grp.Select(x => AppConstants.VoteSelectValues[x.Key!.Value].DisplayName).ToArray();
+
+        Data = grp.Select(x => (double)x.Count()).ToArray();
+
+        StateHasChanged();
+
+        await base.OnInitializedAsync();
+    }
+}

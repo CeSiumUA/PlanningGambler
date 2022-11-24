@@ -10,6 +10,8 @@ public class InterComponentsService
 
     public event EventHandler? StartCountdownTriggered;
 
+    public event EventHandler? VotingOccured;
+
     public event EventHandler<VoteType>? VoteStated;
 
     public event EventHandler<string>? CreateStageRequested;
@@ -69,5 +71,10 @@ public class InterComponentsService
     public void StartCountdown()
     {
         StartCountdownTriggered?.Invoke(this, default!);
+    }
+
+    public void InvokeVotingOccured()
+    {
+        VotingOccured?.Invoke(this, default!);
     }
 }
