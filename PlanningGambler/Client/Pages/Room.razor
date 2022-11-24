@@ -19,21 +19,21 @@
 
 @if (PlanningRoom != null)
 {
-    <MudGrid>
+    <MudGrid Justify="Justify.FlexStart">
         @foreach (var member in PlanningRoom.Members)
         {
             <MudItem>
-                <MudCard>
+                <MudCard Style="min-width: 200px">
                     <MudCardHeader>
                         <CardHeaderContent>
-                            <MudText>@member.DisplayName</MudText>
+                            <MudText Align="@Align.Center">@member.DisplayName</MudText>
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
                         @if(PlanningRoom.CurrentStageId.HasValue){
                             var voteDefinition = @GetMemberVote(member.Id);
 
-                            <MudText Color="@voteDefinition.StyleColor">@voteDefinition.StyledName</MudText>
+                            <MudText Align="@Align.Center" Typo="@Typo.h1" Color="@voteDefinition.StyleColor">@voteDefinition.StyledName</MudText>
                         }
                     </MudCardContent>
                 </MudCard>
