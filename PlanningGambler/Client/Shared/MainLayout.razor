@@ -48,10 +48,11 @@
                         </MudMenu>
                     </MudTooltip>
                 }
+
+                <MudTooltip Text="Copy joining link to clipboard">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Share" Color="Color.Inherit" OnClick="() => CopyJoinLink()" />
+                </MudTooltip>
             }
-            <MudTooltip Text="Copy joining link to clipboard">
-                <MudIconButton Icon="@Icons.Material.Outlined.Share" Color="Color.Inherit" OnClick="() => CopyJoinLink()" />
-            </MudTooltip>
         </MudToolBar>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
