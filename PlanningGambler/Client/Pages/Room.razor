@@ -88,12 +88,12 @@ else
         var vote = stage.Votes.FirstOrDefault(x => x.MemberId == memberId);
         if(vote == null)
         {
-            return new VoteDefinition(string.Empty, string.Empty);
+            return new VoteDefinition(string.Empty, string.Empty, double.NaN);
         }
 
         if(vote.IsHidden || !vote.VoteType.HasValue)
         {
-            return new VoteDefinition(string.Empty, "?");
+            return new VoteDefinition(string.Empty, "?", double.NaN);
         }
 
         return AppConstants.VoteSelectValues[vote.VoteType.Value];

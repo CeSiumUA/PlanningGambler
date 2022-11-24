@@ -10,7 +10,14 @@
         <MudText>Voting stats</MudText>
     </TitleContent>
     <DialogContent>
-        <MudChart ChartType="ChartType.Pie" InputData="@Data" InputLabels="@TypeLabels"></MudChart>
+        <MudTabs>
+            <MudTabPanel Text="Votes count">
+                <MudChart ChartType="ChartType.Pie" InputData="@TypeData" InputLabels="@TypeLabels"></MudChart>
+            </MudTabPanel>
+            <MudTabPanel Text="Votes by user">
+                <MudChart Width="100%" Height="350px" ChartType="ChartType.Bar" ChartSeries="@VoteData" XAxisLabels="@VoteLabels"></MudChart>
+            </MudTabPanel>
+        </MudTabs>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Error" OnClick="Close">Close</MudButton>
@@ -22,9 +29,13 @@
 
     private RoomModel PlanningRoom = default!;
 
-    private double[] Data = new double[0];
+    private double[] TypeData = new double[0];
 
     private string[] TypeLabels = new string[0];
+
+    private List<ChartSeries> VoteData = new List<ChartSeries>();
+
+    private string[] VoteLabels = new string[0];
 
     void Close() => MudDialog.Close(DialogResult.Ok(true));
 
@@ -38,7 +49,20 @@
 
         TypeLabels = grp.Select(x => AppConstants.VoteSelectValues[x.Key!.Value].DisplayName).ToArray();
 
-        Data = grp.Select(x => (double)x.Count()).ToArray();
+        TypeData = grp.Select(x => (double)x.Count()).ToArray();
+
+        var members = PlanningRoom.Members.Where(x => stage.Votes.Where(x => x.VoteType.HasValue).Select(x => x.MemberId).Contains(x.Id));
+
+        VoteLabels = members.Select(x => x.DisplayName).ToArray();
+
+        var votes = stage.Votes.Where(x => x.VoteType.HasValue).ToDictionary(k => k.MemberId, v => v.VoteType);
+
+        VoteData.Clear();
+        VoteData.Add(new ChartSeries()
+            {
+                Name = "Vote",
+                Data = members.Select(x => AppConstants.VoteSelectValues[votes[x.Id]!.Value].Value).ToArray()
+            });
 
         StateHasChanged();
 
