@@ -1,14 +1,17 @@
-﻿@using MudBlazor
+﻿@using Blazored.LocalStorage;
+@using MudBlazor
 @using PlanningGambler.Client.Pages.Dialogs;
 @using PlanningGambler.Client.Services;
 @using PlanningGambler.Client.Models;
 @using PlanningGambler.Shared.Data;
+@using PlanningGambler.Shared.Dtos.Response;
 
 @inherits LayoutComponentBase
 
 @inject NavigationManager _navigationmanager
 @inject InterComponentsService _interComponentService
 @inject IDialogService _dialogService
+@inject ILocalStorageService _localStorageService
 
 <MudThemeProvider IsDarkMode="@true" />
 <MudDialogProvider/>
@@ -25,6 +28,9 @@
             }
             <MudTooltip Text="Select or create voting stage">
                 <MudIconButton Icon="@Icons.Material.Outlined.Add" OnClick="OpenStagesDialog"></MudIconButton>
+            </MudTooltip>
+            <MudTooltip Text="Start countdown">
+                <MudIconButton Icon="@Icons.Material.Outlined.PlayArrow" OnClick="StartCountdown"></MudIconButton>
             </MudTooltip>
             <MudTooltip Text="Vote">
                 <MudMenu Icon="@Icons.Material.Outlined.HowToVote" Color="Color.Inherit">
@@ -60,6 +66,8 @@
 
     private RoomModel? PlanningRoom = default;
 
+    private TokenResponse? Token = default!;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -81,26 +89,32 @@
         _dialogService.Show<SelectStageDialog>("Stages", options);
     }
 
-    protected override Task OnInitializedAsync()
+    void StartCountdown()
     {
-        LoadRoom(_interComponentService.GetStages());
-        _interComponentService.RoomCreated += (sender, e) =>
+        _interComponentService.StartCountdown();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRoom(_interComponentService.GetStages());
+        _interComponentService.RoomCreated += async (sender, e) =>
         {
-            LoadRoom(e);
+            await LoadRoom(e);
         };
 
         _interComponentService.StageSelected += (sender, e) =>
         {
             SelectStage(e);
         };
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
-    private void LoadRoom(RoomModel? roomModel)
+    private async Task LoadRoom(RoomModel? roomModel)
     {
         PlanningRoom = roomModel;
         if (PlanningRoom != null && PlanningRoom.CurrentStageId.HasValue)
         {
+            Token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
             SelectStage(PlanningRoom.CurrentStageId.Value);
         }
     }

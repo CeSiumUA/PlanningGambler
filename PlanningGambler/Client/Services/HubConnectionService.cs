@@ -65,6 +65,11 @@ public class HubConnectionService : IAsyncDisposable
         return _hubConnection.InvokeAsync<SelectStageResponseDto>("SelectStage", stageId);
     }
 
+    public Task StartCountdown()
+    {
+        return _hubConnection.SendAsync("StartCountDown");
+    }
+
     private Task<string?> RetrieveToken()
     {
         return Task.FromResult(_token);

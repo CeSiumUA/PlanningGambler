@@ -31,6 +31,10 @@
             </MudItem>
         }
     </MudGrid>
+
+    <MudOverlay @bind-Visible="ShowOverlay" DarkBackground="true">
+        <MudText Typo="Typo.h1">@CountDownCounter</MudText>
+    </MudOverlay>
 }
 else
 {
@@ -39,6 +43,10 @@ else
 
 @code {
     private RoomModel PlanningRoom = default!;
+
+    private bool ShowOverlay = false;
+
+    private int CountDownCounter;
 
     private Dictionary<Guid, VotingMemberModel> VotingMembers = new Dictionary<Guid, VotingMemberModel>();
 
@@ -112,11 +120,23 @@ else
         _interComponentsService.GetRoomStagesModelsRequested += () => PlanningRoom;
         _interComponentsService.CreateStageRequested += async (_, e) => await CreateStage(e);
         _interComponentsService.SelectStageRequested += async (_, e) => await SelectStage(e);
+        _interComponentsService.StartCountdownTriggered += async (_, _) => await StartCountDown();
 
         _hubConnectionService.StageCreated += (_, e) => HandleStageCreated(e);
         _hubConnectionService.StageSelected += (_, e) => HandleStageSelected(e);
         _hubConnectionService.MemberConnected += (_, e) => HandleMemberConnected(e);
         _hubConnectionService.MemberDisconnected += (_, e) => HandleMemberDisconnected(e);
+        _hubConnectionService.CountDownOccured += (_, e) => HandleCountDownTicks(e);
+    }
+
+    private void HandleCountDownTicks(int seconds)
+    {
+        CountDownCounter = seconds;
+    }
+
+    private Task StartCountDown()
+    {
+        return _hubConnectionService.StartCountdown();
     }
 
     private void HandleMemberConnected(MemberConnectedResponseDto member)

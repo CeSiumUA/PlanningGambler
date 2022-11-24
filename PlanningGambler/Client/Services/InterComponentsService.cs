@@ -8,6 +8,8 @@ public class InterComponentsService
 {
     public event EventHandler? ShareRoomEventTriggered;
 
+    public event EventHandler? StartCountdownTriggered;
+
     public event EventHandler<VoteType>? VoteStated;
 
     public event EventHandler<string>? CreateStageRequested;
@@ -62,5 +64,10 @@ public class InterComponentsService
     public void InvokeRoomCreated(RoomModel roomModel)
     {
         RoomCreated?.Invoke(this, roomModel);
+    }
+
+    public void StartCountdown()
+    {
+        StartCountdownTriggered?.Invoke(this, default!);
     }
 }
