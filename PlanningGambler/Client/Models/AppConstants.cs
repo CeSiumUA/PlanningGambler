@@ -1,4 +1,5 @@
-﻿using PlanningGambler.Shared.Data;
+﻿using MudBlazor;
+using PlanningGambler.Shared.Data;
 
 namespace PlanningGambler.Client.Models;
 
@@ -6,19 +7,19 @@ public class AppConstants
 {
     public const string TokenStoreKey = "stored_token";
 
-    public static Dictionary<VoteType, string> VoteSelectValues { get; } = new Dictionary<VoteType, string>()
+    public static Dictionary<VoteType, VoteDefinition> VoteSelectValues { get; } = new Dictionary<VoteType, VoteDefinition>()
     {
-        {VoteType.None, "None" },
-        {VoteType.One, "1" },
-        {VoteType.Two, "2" },
-        {VoteType.Three, "3" },
-        {VoteType.Five, "5" },
-        {VoteType.Eight, "8" },
-        {VoteType.Thirteen, "13" },
-        {VoteType.TwentyOne, "21" },
-        {VoteType.ThirtyFour, "34" },
-        {VoteType.FiftyFive, "55" },
-        {VoteType.EightyNine, "89" },
-        {VoteType.HoldOn, "Hold" }
+        {VoteType.None, new VoteDefinition("None", "-") },
+        {VoteType.One, new VoteDefinition("1", "1") },
+        {VoteType.Two, new VoteDefinition("2", "2") },
+        {VoteType.Three, new VoteDefinition("3", "3") },
+        {VoteType.Five, new VoteDefinition("5", "5") },
+        {VoteType.Eight, new VoteDefinition("8", "8") },
+        {VoteType.Thirteen, new VoteDefinition("13", "13") },
+        {VoteType.TwentyOne, new VoteDefinition("21", "21") },
+        {VoteType.ThirtyFour, new VoteDefinition("34", "34") },
+        {VoteType.FiftyFive, new VoteDefinition("55", "55") },
+        {VoteType.EightyNine, new VoteDefinition("89", "89") },
+        {VoteType.HoldOn, new VoteDefinition("Hold", "🤷‍♂️") }
     };
 }

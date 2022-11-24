@@ -31,8 +31,9 @@
                     </MudCardHeader>
                     <MudCardContent>
                         @if(PlanningRoom.CurrentStageId.HasValue){
-                            var memberVote = GetMemberVote(member.Id);
-                            <MudText>@(memberVote != null ? (memberVote.VoteType.HasValue ? memberVote.VoteType : "?") : string.Empty)</MudText>
+                            var voteDefinition = @GetMemberVote(member.Id);
+
+                            <MudText Color="@voteDefinition.StyleColor">@voteDefinition.StyledName</MudText>
                         }
                     </MudCardContent>
                 </MudCard>
@@ -80,11 +81,22 @@ else
         await base.OnInitializedAsync();
     }
 
-    private RoomVoteModel? GetMemberVote(Guid memberId)
+    private VoteDefinition GetMemberVote(Guid memberId)
     {
         var stage = GetCurrentStage();
 
-        return stage.Votes.FirstOrDefault(x => x.MemberId == memberId);
+        var vote = stage.Votes.FirstOrDefault(x => x.MemberId == memberId);
+        if(vote == null)
+        {
+            return new VoteDefinition(string.Empty, string.Empty);
+        }
+
+        if(vote.IsHidden || !vote.VoteType.HasValue)
+        {
+            return new VoteDefinition(string.Empty, "?");
+        }
+
+        return AppConstants.VoteSelectValues[vote.VoteType.Value];
     }
 
     private async Task InitializeRoom(string token)
