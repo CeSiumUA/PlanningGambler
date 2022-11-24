@@ -15,4 +15,6 @@ public class HubConstants
     public const string VoteResultsMethod = "VoteResultsStated";
 
     public const string MemberVoted = "MemberVoted";
+
+    public const string PingMember = "PingMember";
 }

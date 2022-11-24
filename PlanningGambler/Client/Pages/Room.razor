@@ -17,6 +17,11 @@
 
 <PageTitle>Planning Room</PageTitle>
 
+@if (PingRequested)
+{
+    <audio autoplay hidden controls><source src="notification.wav" /></audio>
+}
+
 @if (PlanningRoom != null)
 {
     <MudGrid Justify="Justify.FlexStart">
@@ -28,6 +33,14 @@
                         <CardHeaderContent>
                             <MudText Align="@Align.Center">@member.DisplayName</MudText>
                         </CardHeaderContent>
+                        <CardHeaderActions>
+                            @if (Token != null && Token.MemberType == MemberType.Administrator)
+                            {
+                                <MudMenu Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit">
+                                    <MudMenuItem OnClick="() => PingMember(member.Id)">Ping</MudMenuItem>
+                                </MudMenu>
+                            }
+                        </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent>
                         @if(PlanningRoom.CurrentStageId.HasValue){
@@ -55,22 +68,26 @@ else
 
     private bool ShowOverlay = false;
 
+    private TokenResponse? Token = default!;
+
     private int CountDownCounter;
+
+    private bool PingRequested = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
+        Token = await _localStorageService.GetItemAsync<TokenResponse?>(AppConstants.TokenStoreKey);
 
-        if(token != null)
+        if (Token != null)
         {
-            var isTokenValid = await _roomEntryProvider.CheckTokenValidity(token.Token);
+            var isTokenValid = await _roomEntryProvider.CheckTokenValidity(Token.Token);
             if (!isTokenValid)
             {
                 _navigationManager.NavigateTo("/");
             }
             else
             {
-                await InitializeRoom(token.Token);
+                await InitializeRoom(Token.Token);
             }
         }
         else
@@ -104,6 +121,11 @@ else
         await _hubConnectionService.StartConnectionAsync(token);
         RegisterHandlers();
         await GetRoom();
+    }
+
+    private async Task PingMember(Guid memberId)
+    {
+        await _hubConnectionService.PingMember(memberId);
     }
 
     private async Task GetRoom()
@@ -154,11 +176,20 @@ else
         _hubConnectionService.CountDownOccured += (_, e) => HandleCountDownTicks(e);
         _hubConnectionService.VoteOccured += (_, e) => HandleVoteOccured(e);
         _hubConnectionService.VotesStated += (_, e) => HandleVoteStated(e);
+        _hubConnectionService.PingRequested += (_, _) => HandlePingRequested();
     }
 
     private RoomStageModel GetCurrentStage()
     {
         return PlanningRoom.Stages.First(x => x.Id == PlanningRoom.CurrentStageId);
+    }
+
+    private void HandlePingRequested()
+    {
+        PingRequested = false;
+        StateHasChanged();
+        PingRequested = true;
+        StateHasChanged();
     }
 
     private void HandleVoteStated(StageVotesResultDto stageVotesResultDto)

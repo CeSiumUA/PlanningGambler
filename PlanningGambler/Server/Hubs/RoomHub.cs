@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using PlanningGambler.Server.Commands;
 using PlanningGambler.Server.Handlers;
+using PlanningGambler.Server.Services.Interfaces;
 using PlanningGambler.Shared.Data;
 using PlanningGambler.Shared.Dtos.Response;
 using System.Security.Claims;
@@ -16,10 +17,13 @@ public class RoomHub : Hub
 
     private readonly ILogger<RoomHub> _logger;
 
-    public RoomHub(ISender sender, ILogger<RoomHub> logger)
+    private readonly ISessionStorage _sessionStorage;
+
+    public RoomHub(ISender sender, ILogger<RoomHub> logger, ISessionStorage sessionStorage)
     {
         _sender = sender;
         _logger = logger;
+        _sessionStorage = sessionStorage;
     }
 
     public override async Task OnConnectedAsync()
@@ -34,6 +38,8 @@ public class RoomHub : Hub
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
 
         await Clients.GroupExcept(roomId.ToString(), new[] {Context.ConnectionId}).SendAsync(HubConstants.MemberConnectedMethod, new MemberConnectedResponseDto(memberId, displayName, memberType));
+
+        _sessionStorage.AddSession(Context.ConnectionId, memberId);
 
         await base.OnConnectedAsync();
     }
@@ -53,6 +59,8 @@ public class RoomHub : Hub
         {
             _logger.LogError(exception.ToString());
         }
+
+        _sessionStorage.RemoveSession(memberId);
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -90,6 +98,14 @@ public class RoomHub : Hub
         await Clients.GroupExcept(roomId.ToString(), new[] { Context.ConnectionId }).SendAsync(HubConstants.StageCreatedMethod, stageDto);
 
         return stageDto;
+    }
+
+    [Authorize(Roles = "Administrator")]
+    public async Task PingMember(Guid pingMemberId)
+    {
+        var targetConnectionId = _sessionStorage.GetSession(pingMemberId);
+
+        await Clients.Client(targetConnectionId).SendAsync(HubConstants.PingMember, pingMemberId);
     }
 
     [Authorize(Roles = "Administrator")]

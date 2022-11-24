@@ -25,6 +25,7 @@ public static class ServiceExtensions
             .AddMediatR(typeof(Room).Assembly)
             .AddSingleton<IRoomStorage, RoomStorageService>()
             .AddSingleton<ITokenKeyProvider>(tokenService)
+            .AddSingleton<ISessionStorage, SessionStorageService>()
             .AddConfiguredAuthentication(tokenService)
             .AddMediatR(assembly)
             .AddFluentValidation(new[] { assembly })

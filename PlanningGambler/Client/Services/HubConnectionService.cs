@@ -13,6 +13,7 @@ public class HubConnectionService : IAsyncDisposable
     public event EventHandler<int>? CountDownOccured;
     public event EventHandler<StageVotesResultDto>? VotesStated;
     public event EventHandler<VoteDto>? VoteOccured;
+    public event EventHandler? PingRequested;
 
     private readonly HubConnection _hubConnection;
     private readonly HttpClient _httpClient;
@@ -75,6 +76,11 @@ public class HubConnectionService : IAsyncDisposable
         return Task.FromResult(_token);
     }
 
+    public Task PingMember(Guid memberId)
+    {
+        return _hubConnection.SendAsync("PingMember", memberId);
+    }
+
     private void RegisterHandlers()
     {
         _hubConnection.On<SelectStageResponseDto>(HubConstants.StageChangedMethod, x => StageSelected?.Invoke(this, x));
@@ -90,6 +96,8 @@ public class HubConnectionService : IAsyncDisposable
         _hubConnection.On<StageVotesResultDto>(HubConstants.VoteResultsMethod, x => VotesStated?.Invoke(this, x));
 
         _hubConnection.On<VoteDto>(HubConstants.MemberVoted, x => VoteOccured?.Invoke(this, x));
+
+        _hubConnection.On<Guid>(HubConstants.PingMember, x => PingRequested?.Invoke(this, default!));
     }
 
     public async ValueTask DisposeAsync()
