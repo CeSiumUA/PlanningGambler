@@ -37,7 +37,7 @@
                             @if (Token != null && Token.MemberType == MemberType.Administrator)
                             {
                                 <MudMenu Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit">
-                                    <MudMenuItem OnClick="() => PingMember(member.Id)">Ping</MudMenuItem>
+                                    <MudMenuItem OnClick="() => PingMember(member.Id)" OnTouch="() => PingMember(member.Id)">Ping</MudMenuItem>
                                 </MudMenu>
                             }
                         </CardHeaderActions>
