@@ -49,7 +49,7 @@
                         <MudMenu Icon="@Icons.Material.Outlined.HowToVote" Color="Color.Inherit">
                             @foreach (var voteValue in AppConstants.VoteSelectValues)
                             {
-                                <MudMenuItem OnClick="() => Vote(voteValue.Key)">@voteValue.Value.DisplayName</MudMenuItem>
+                                <MudMenuItem OnClick="() => Vote(voteValue.Key)" OnTouch="() => Vote(voteValue.Key)">@voteValue.Value.DisplayName</MudMenuItem>
                             }
                         </MudMenu>
                     </MudTooltip>

@@ -8,7 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
 		Dockerfile = Dockerfile
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
-		.github\workflows\heroku-deploy.yml = .github\workflows\heroku-deploy.yml
+		.github\workflows\planning-gambler.yml = .github\workflows\planning-gambler.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningGambler.Server", "PlanningGambler\Server\PlanningGambler.Server.csproj", "{A0FA3B6A-BF87-4C76-9A6B-B5A36A000C8E}"
