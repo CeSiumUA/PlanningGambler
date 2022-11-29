@@ -30,7 +30,7 @@
 </MudGrid>
 
 @code{
-    private bool IsRoomNotExists = false;
+    private bool IsRoomNotExists = true;
 
     private void GoToRoom()
     {
@@ -55,6 +55,8 @@
         {
             IsRoomNotExists = !(await _roomEntryProvider.CheckTokenValidity(token.Token));
         }
+
+        StateHasChanged();
 
         await base.OnInitializedAsync();
     }
