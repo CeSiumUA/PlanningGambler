@@ -3,4 +3,4 @@
 // be reflected on the first load after each change).
 self.addEventListener('fetch', () => { });
 
-const CACHE_VERSION = 1.0;
+const CACHE_VERSION = 1.1;
